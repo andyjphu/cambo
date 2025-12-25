@@ -306,6 +306,11 @@ export function AnalyzePage() {
                   const entry = lookupKhmer(wordData.word);
                   if (!entry) return null;
 
+                  // Get romanization based on mode
+                  const displayRomanization = showIPA 
+                    ? (entry.romanized || entry.phonetic?.toLowerCase() || '') 
+                    : (entry.phonetic || '');
+
                   return (
                     <div key={idx} className="dict-entry">
                       <span className="dict-khmer" style={khmerFontStyle}>
@@ -313,7 +318,9 @@ export function AnalyzePage() {
                       </span>
                       <span className="dict-arrow">→</span>
                       <div className="dict-pronunciation">
-                        <span className="dict-phonetic">{entry.phonetic}</span>
+                        <span className={`dict-phonetic ${showIPA ? 'ipa-mode' : ''}`}>
+                          {displayRomanization}
+                        </span>
                       </div>
                       <span className="dict-english">{entry.english}</span>
                       {entry.pos && (
