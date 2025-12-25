@@ -25,6 +25,143 @@
   color: var(--color-secondary);
 }
 
+/* Mode Toggle Buttons */
+.input-mode-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mode-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mode-toggle-btn:hover:not(:disabled) {
+  background: var(--color-bg);
+  color: var(--color-text);
+  border-color: var(--color-secondary);
+}
+
+.mode-toggle-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.mode-toggle-btn.confirm-btn:hover:not(:disabled) {
+  color: var(--color-success, #22c55e);
+  border-color: var(--color-success, #22c55e);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.mode-toggle-btn.edit-btn:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  background: rgba(0, 122, 255, 0.1);
+}
+
+/* Khmer Display (non-edit mode) */
+.khmer-display {
+  position: relative;
+  width: 100%;
+  padding: 1.25rem 1.5rem;
+  padding-right: 3.5rem;
+  font-size: 1.5rem;
+  line-height: 2;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  transition: all 0.2s ease;
+  min-height: 5rem;
+}
+
+.khmer-display:not(.interactive):hover {
+  border-color: var(--color-secondary);
+  background: var(--color-surface);
+  cursor: pointer;
+}
+
+.khmer-display.interactive {
+  cursor: default;
+}
+
+.khmer-display .placeholder {
+  color: var(--color-tertiary);
+  font-style: italic;
+}
+
+/* Edit overlay button */
+.edit-overlay-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-tertiary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  opacity: 0.6;
+}
+
+.edit-overlay-btn:hover {
+  opacity: 1;
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  background: rgba(0, 122, 255, 0.1);
+}
+
+/* Interactive cluster in display mode - render as single unit for proper Khmer ligatures */
+.input-cluster {
+  display: inline;
+  position: relative;
+  border-radius: 6px;
+  padding: 0.125rem 0.25rem;
+  margin: 0 0.125rem;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  background: var(--syllable-bg, transparent);
+}
+
+.input-cluster:hover {
+  box-shadow: 0 0 0 2px var(--syllable-accent, var(--color-accent));
+}
+
+.input-cluster.highlighted {
+  box-shadow: 0 0 0 3px var(--syllable-accent, var(--color-accent));
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.input-space {
+  display: inline;
+  width: 0.5em;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 3px var(--syllable-accent, var(--color-accent));
+  }
+  50% {
+    box-shadow: 0 0 0 5px var(--syllable-accent, var(--color-accent));
+  }
+}
+
 .khmer-input {
   width: 100%;
   padding: 1.25rem 1.5rem;
@@ -86,9 +223,29 @@
   display: inline-flex;
   align-items: baseline;
   position: relative;
-  padding: 0.125rem;
-  border-radius: 6px;
+  padding: 0.25rem 0.125rem;
+  border-radius: 8px;
   transition: all 0.15s ease;
+  margin: 0.125rem;
+  cursor: pointer;
+}
+
+.cluster-wrapper:hover {
+  box-shadow: 0 0 0 2px var(--syllable-accent, var(--color-accent));
+}
+
+.cluster-wrapper.cluster-highlighted {
+  box-shadow: 0 0 0 3px var(--syllable-accent, var(--color-accent));
+  animation: clusterPulse 1s ease-in-out infinite;
+}
+
+@keyframes clusterPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 3px var(--syllable-accent, var(--color-accent));
+  }
+  50% {
+    box-shadow: 0 0 0 5px var(--syllable-accent, var(--color-accent));
+  }
 }
 
 .word-separator {
@@ -115,12 +272,25 @@
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.15s ease;
+  /* Text color stays dark/readable, background varies by component type */
+  color: var(--color-text);
 }
 
-.char-component:hover,
-.char-component.hovered {
-  transform: scale(1.1);
+.char-component:hover {
+  transform: scale(1.05);
   z-index: 10;
+  box-shadow: 0 0 0 2px var(--syllable-accent, var(--color-accent));
+}
+
+/* Component-level highlighting - when specific component is selected */
+.char-component.comp-highlighted {
+  transform: scale(1.15);
+  z-index: 20;
+  box-shadow: 
+    0 0 0 3px var(--color-bg),
+    0 0 0 5px var(--syllable-accent, var(--color-accent)),
+    0 4px 20px rgba(0, 0, 0, 0.25);
+  /* No animation - keeps tooltip stable */
 }
 
 /* Component Tooltip */
@@ -141,7 +311,7 @@
   align-items: center;
   gap: 0.25rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  animation: tooltipFadeIn 0.15s ease;
+  animation: tooltipFadeIn 0.12s ease-out;
 }
 
 .component-tooltip::after {
@@ -176,6 +346,231 @@
   opacity: 0.8;
 }
 
+/* Unified Tooltip - shows syllable, word, and component info */
+.unified-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-text);
+  color: var(--color-bg);
+  border-radius: 10px;
+  width: 300px;
+  max-width: min(340px, calc(100vw - 1rem));
+  overflow: hidden;
+  z-index: 1000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  animation: tooltipFadeIn 0.12s ease-out;
+}
+
+.unified-tooltip.cluster-only {
+  width: auto;
+  min-width: 180px;
+  max-width: 280px;
+}
+
+.unified-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--color-text);
+}
+
+/* Tooltip Header Row - compact syllable info */
+.tooltip-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tooltip-header-row .tooltip-khmer {
+  font-size: 1.25rem;
+}
+
+.tooltip-sound {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.tooltip-sound.phonetic {
+  color: #FFD60A;
+}
+
+.tooltip-sound.ipa {
+  color: #64D2FF;
+}
+
+.tooltip-meaning {
+  font-size: 0.6875rem;
+  color: #30D158;
+  margin-left: auto;
+}
+
+/* Two Column Layout */
+.tooltip-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tooltip-column {
+  padding: 0.375rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.word-column {
+  background: rgba(34, 197, 94, 0.04);
+}
+
+.component-column {
+  background: rgba(100, 210, 255, 0.04);
+}
+
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.375rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 0.25rem;
+}
+
+.column-label {
+  font-size: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.word-column .column-label {
+  color: #30D158;
+}
+
+.component-column .column-label {
+  color: #64D2FF;
+}
+
+.column-khmer {
+  font-size: 0.9375rem;
+}
+
+.column-char {
+  font-size: 1.125rem;
+}
+
+.column-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.column-row {
+  display: flex;
+  align-items: center;
+}
+
+.column-value {
+  font-size: 0.6875rem;
+}
+
+.column-value.phonetic {
+  font-family: var(--font-mono);
+  color: #FFD60A;
+}
+
+.column-value.english {
+  color: #30D158;
+  font-weight: 500;
+}
+
+.column-value.name {
+  opacity: 0.7;
+}
+
+.column-pos {
+  font-size: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 0.125rem;
+}
+
+.column-desc {
+  font-size: 0.5625rem;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  margin-top: 0.125rem;
+}
+
+.column-na {
+  font-size: 0.75rem;
+  opacity: 0.3;
+  text-align: center;
+}
+
+/* Word row for cluster-only tooltip */
+.tooltip-word-row {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  background: rgba(34, 197, 94, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.6875rem;
+}
+
+.word-label {
+  opacity: 0.5;
+  font-size: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.word-khmer {
+  font-size: 0.875rem;
+}
+
+.word-meaning {
+  color: #30D158;
+  margin-left: auto;
+}
+
+/* Mini components - compact */
+.tooltip-components {
+  padding: 0.375rem 0.625rem;
+  background: rgba(0, 0, 0, 0.15);
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.mini-component {
+  font-size: 0.8125rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  transition: all 0.1s ease;
+}
+
+.mini-component.active {
+  box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 3px rgba(255, 255, 255, 0.8);
+  transform: scale(1.15);
+}
+
 /* Legend */
 .legend-section {
   margin-bottom: 2rem;
@@ -186,6 +581,11 @@
   flex-wrap: wrap;
   gap: 1rem;
   justify-content: center;
+  align-items: center;
+}
+
+.legend.syllable-legend {
+  gap: 1.5rem;
 }
 
 .legend-item {
@@ -201,10 +601,34 @@
   border: 2px solid;
 }
 
+/* Shade indicators for syllable legend */
+.legend-color.dark {
+  background: rgba(0, 122, 255, 0.25);
+  border-color: var(--color-accent);
+}
+
+.legend-color.medium {
+  background: rgba(0, 122, 255, 0.15);
+  border-color: var(--color-accent);
+}
+
+.legend-color.light {
+  background: rgba(0, 122, 255, 0.08);
+  border-color: var(--color-accent);
+}
+
 .legend-label {
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--color-secondary);
+}
+
+.legend-note {
+  font-size: 0.6875rem;
+  color: var(--color-tertiary);
+  font-style: italic;
+  padding-left: 1rem;
+  border-left: 1px solid var(--color-border);
 }
 
 /* Word Row */
@@ -239,11 +663,25 @@
 }
 
 .syllable:hover,
-.syllable.hovered {
+.syllable.highlighted {
   background: var(--color-surface);
   border-bottom-color: var(--accent-color, var(--color-accent));
   transform: translateY(-2px);
-  z-index: 50; /* Ensure hovered syllable + tooltip appear above other syllables */
+  z-index: 50;
+}
+
+.syllable.highlighted {
+  box-shadow: 0 0 0 2px var(--accent-color, var(--color-accent));
+  animation: syllablePulse 1s ease-in-out infinite;
+}
+
+@keyframes syllablePulse {
+  0%, 100% {
+    box-shadow: 0 0 0 2px var(--accent-color, var(--color-accent));
+  }
+  50% {
+    box-shadow: 0 0 0 4px var(--accent-color, var(--color-accent));
+  }
 }
 
 .syllable-text {
@@ -264,7 +702,7 @@
   overflow: hidden;
   z-index: 100;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-  animation: tooltipFadeIn 0.2s ease;
+  animation: tooltipFadeIn 0.12s ease-out;
 }
 
 .syllable-tooltip::after {
@@ -356,8 +794,9 @@
 .mini-component {
   font-size: 1rem;
   padding: 0.25rem 0.5rem;
-  background: rgba(255, 255, 255, 0.1);
+  /* Background is set inline based on component type */
   border-radius: 4px;
+  color: var(--color-bg); /* Light text on dark tooltip bg + colored component bg */
 }
 
 /* Dictionary Matches */
@@ -425,11 +864,9 @@
 @keyframes tooltipFadeIn {
   from {
     opacity: 0;
-    transform: translateX(-50%) translateY(4px);
   }
   to {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
   }
 }
 

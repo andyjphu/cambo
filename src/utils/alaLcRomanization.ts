@@ -80,14 +80,55 @@ export const vowelRomanization: Record<string, {
 export const signEffects: Record<string, {
   effect: 'nasal' | 'stop' | 'aspirate' | 'register' | 'none';
   append?: string;
+  romanized: string;
+  phonetic: string;
+  name: string;
   description: string;
 }> = {
-  'ំ': { effect: 'nasal', append: 'm', description: 'Adds nasal ending' },
-  'ះ': { effect: 'aspirate', append: 'h', description: 'Adds aspirated ending' },
-  '់': { effect: 'stop', description: 'Shortens vowel (stop)' },
-  '៉': { effect: 'register', description: 'Converts to 1st series' },
-  '៊': { effect: 'register', description: 'Converts to 2nd series' },
-  '្': { effect: 'none', description: 'Subscript marker' },
+  'ំ': { 
+    effect: 'nasal', 
+    append: 'm', 
+    romanized: 'm',
+    phonetic: 'M',
+    name: 'nikahit',
+    description: 'Nasal final - adds "m" sound to end of syllable' 
+  },
+  'ះ': { 
+    effect: 'aspirate', 
+    append: 'h', 
+    romanized: 'h',
+    phonetic: 'H',
+    name: 'reahmuk',
+    description: 'Aspirated final - adds breathy "h" to end of syllable' 
+  },
+  '់': { 
+    effect: 'stop', 
+    romanized: '̆',
+    phonetic: '(short)',
+    name: 'bantoc',
+    description: 'Vowel shortener - makes the vowel short/clipped' 
+  },
+  '៉': { 
+    effect: 'register', 
+    romanized: '°',
+    phonetic: '(1st)',
+    name: 'musĕkâtônd',
+    description: 'Series shifter - converts 2nd series consonant to 1st series sound' 
+  },
+  '៊': { 
+    effect: 'register', 
+    romanized: '°',
+    phonetic: '(2nd)',
+    name: 'trĕysâp',
+    description: 'Series shifter - converts 1st series consonant to 2nd series sound' 
+  },
+  '្': { 
+    effect: 'none', 
+    romanized: '͓',
+    phonetic: '(sub)',
+    name: 'coeng',
+    description: 'Subscript marker - indicates next consonant is pronounced as a cluster' 
+  },
 };
 
 export interface RomanizationResult {
@@ -298,6 +339,7 @@ export function getCharRomanization(char: string, type: KhmerCharType): {
   romanized: string;
   phonetic: string;
   name: string;
+  description?: string;
 } | null {
   if (type === 'consonant' || type === 'subscript') {
     const info = consonantRomanization[char];
@@ -316,6 +358,17 @@ export function getCharRomanization(char: string, type: KhmerCharType): {
         romanized: info.series1, // Default to series 1
         phonetic: toPhoneticVowel(info.series1).toUpperCase(),
         name: info.name,
+      };
+    }
+  }
+  if (type === 'sign' || type === 'coeng') {
+    const info = signEffects[char];
+    if (info) {
+      return {
+        romanized: info.romanized,
+        phonetic: info.phonetic,
+        name: info.name,
+        description: info.description,
       };
     }
   }

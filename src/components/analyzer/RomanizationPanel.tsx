@@ -1,22 +1,34 @@
 import { useMemo } from 'react';
 import { useSettings } from '../../context/SettingsContext';
-import { parseKhmerText, type KhmerCluster } from '../../utils/khmerParser';
+import { type KhmerCluster } from '../../utils/khmerParser';
 import { romanizeCluster } from '../../utils/alaLcRomanization';
 import { lookupKhmer } from '../../utils/dictionaryCore';
+import { getSyllableColor } from '../../utils/colors';
 import { ConfidenceWarning } from './ConfidenceWarning';
 import './RomanizationPanel.css';
 
 interface RomanizationPanelProps {
   text: string;
+  clusters: KhmerCluster[];
+  activeClusterIdx: number | null;
+  onClusterHover: (clusterIdx: number | null) => void;
+  onClusterClick: (clusterIdx: number) => void;
+  getNonSpaceIdx: (clusterIdx: number) => number;
 }
 
-export function RomanizationPanel({ text }: RomanizationPanelProps) {
+export function RomanizationPanel({ 
+  text, 
+  clusters, 
+  activeClusterIdx, 
+  onClusterHover, 
+  onClusterClick,
+  getNonSpaceIdx,
+}: RomanizationPanelProps) {
   const { settings } = useSettings();
   
   const romanizedData = useMemo(() => {
     if (!text.trim()) return [];
     
-    const clusters = parseKhmerText(text);
     const result: Array<{
       khmer: string;
       romanized: string;
@@ -25,9 +37,10 @@ export function RomanizationPanel({ text }: RomanizationPanelProps) {
       confidence: 'high' | 'medium' | 'low';
       warnings: string[];
       isSpace: boolean;
+      clusterIdx: number;
     }> = [];
     
-    for (const cluster of clusters) {
+    clusters.forEach((cluster, clusterIdx) => {
       if (cluster.type === 'space') {
         result.push({
           khmer: ' ',
@@ -36,8 +49,9 @@ export function RomanizationPanel({ text }: RomanizationPanelProps) {
           confidence: 'high',
           warnings: [],
           isSpace: true,
+          clusterIdx,
         });
-        continue;
+        return;
       }
       
       // Check dictionary first
@@ -51,6 +65,7 @@ export function RomanizationPanel({ text }: RomanizationPanelProps) {
           confidence: 'high',
           warnings: [],
           isSpace: false,
+          clusterIdx,
         });
       } else {
         // Use algorithmic romanization
@@ -62,12 +77,13 @@ export function RomanizationPanel({ text }: RomanizationPanelProps) {
           confidence: rom.confidence,
           warnings: rom.warnings,
           isSpace: false,
+          clusterIdx,
         });
       }
-    }
+    });
     
     return result;
-  }, [text]);
+  }, [text, clusters]);
   
   if (!settings.showRomanizationPanel || !text.trim()) {
     return null;
@@ -87,8 +103,25 @@ export function RomanizationPanel({ text }: RomanizationPanelProps) {
             return <span key={idx} className="rom-space"> </span>;
           }
           
+          const nonSpaceIdx = getNonSpaceIdx(item.clusterIdx);
+          const syllableColor = getSyllableColor(nonSpaceIdx);
+          const isHighlighted = activeClusterIdx === item.clusterIdx;
+          
           return (
-            <span key={idx} className="rom-item">
+            <span 
+              key={idx} 
+              className={`rom-item romanization-cluster ${isHighlighted ? 'highlighted' : ''}`}
+              style={{
+                '--syllable-accent': syllableColor.accent,
+                '--syllable-bg': syllableColor.bgLight,
+              } as React.CSSProperties}
+              onMouseEnter={() => onClusterHover(item.clusterIdx)}
+              onMouseLeave={() => onClusterHover(null)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClusterClick(item.clusterIdx);
+              }}
+            >
               <span className="rom-phonetic">
                 {showIPA ? item.romanized : item.phonetic}
                 <ConfidenceWarning 

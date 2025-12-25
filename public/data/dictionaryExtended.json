@@ -1,0 +1,890 @@
+[
+  {
+    "khmer": "ចេះ",
+    "english": "know how to",
+    "pos": "verb",
+    "romanized": "chéh",
+    "phonetic": "CHAYH",
+    "frequency": 85
+  },
+  {
+    "khmer": "ឃើញ",
+    "english": "see",
+    "pos": "verb",
+    "romanized": "kheu-ñô",
+    "phonetic": "KHEU-NYO",
+    "frequency": 90
+  },
+  {
+    "khmer": "ឮ",
+    "english": "hear",
+    "pos": "verb",
+    "romanized": "",
+    "phonetic": "",
+    "frequency": 85
+  },
+  {
+    "khmer": "ចាប់",
+    "english": "catch/start",
+    "pos": "verb",
+    "romanized": "chā-bâ",
+    "phonetic": "CHAH-BA",
+    "frequency": 80
+  },
+  {
+    "khmer": "បើក",
+    "english": "open/drive",
+    "pos": "verb",
+    "romanized": "baeu-kâ",
+    "phonetic": "BEU-KA",
+    "frequency": 85
+  },
+  {
+    "khmer": "បិទ",
+    "english": "close",
+    "pos": "verb",
+    "romanized": "bĕ-tô",
+    "phonetic": "BE-TO",
+    "frequency": 80
+  },
+  {
+    "khmer": "ជួយ",
+    "english": "help",
+    "pos": "verb",
+    "romanized": "chuŏ-yô",
+    "phonetic": "CHUO-YO",
+    "frequency": 85
+  },
+  {
+    "khmer": "រៀន",
+    "english": "learn/study",
+    "pos": "verb",
+    "romanized": "riĕ-nô",
+    "phonetic": "RIA-NO",
+    "frequency": 85
+  },
+  {
+    "khmer": "បង្រៀន",
+    "english": "teach",
+    "pos": "verb",
+    "romanized": "bngriĕ-nô",
+    "phonetic": "BNGRIA-NO",
+    "frequency": 75
+  },
+  {
+    "khmer": "ធ្វើការ",
+    "english": "work",
+    "pos": "verb",
+    "romanized": "thveu-kā-rô",
+    "phonetic": "THVEU-KAH-RO",
+    "frequency": 85
+  },
+  {
+    "khmer": "សម្រាក",
+    "english": "rest",
+    "pos": "verb",
+    "romanized": "smrā-kâ",
+    "phonetic": "SMRAH-KA",
+    "frequency": 75
+  },
+  {
+    "khmer": "លេង",
+    "english": "play",
+    "pos": "verb",
+    "romanized": "lé-ngô",
+    "phonetic": "LAY-NGO",
+    "frequency": 80
+  },
+  {
+    "khmer": "កើត",
+    "english": "be born/happen",
+    "pos": "verb",
+    "romanized": "kaeu-tâ",
+    "phonetic": "KEU-TA",
+    "frequency": 75
+  },
+  {
+    "khmer": "ស្លាប់",
+    "english": "die",
+    "pos": "verb",
+    "romanized": "slā-bâ",
+    "phonetic": "SLAH-BA",
+    "frequency": 70
+  },
+  {
+    "khmer": "ចូល",
+    "english": "enter",
+    "pos": "verb",
+    "romanized": "cho-lô",
+    "phonetic": "CHOH-LO",
+    "frequency": 80
+  },
+  {
+    "khmer": "ចេញ",
+    "english": "exit/leave",
+    "pos": "verb",
+    "romanized": "ché-ñô",
+    "phonetic": "CHAY-NYO",
+    "frequency": 80
+  },
+  {
+    "khmer": "ដឹក",
+    "english": "transport/carry",
+    "pos": "verb",
+    "romanized": "dœ̆-kâ",
+    "phonetic": "DEU-KA",
+    "frequency": 70
+  },
+  {
+    "khmer": "កាត់",
+    "english": "cut",
+    "pos": "verb",
+    "romanized": "kā-tâ",
+    "phonetic": "KAH-TA",
+    "frequency": 75
+  },
+  {
+    "khmer": "ស្រី",
+    "english": "female",
+    "pos": "noun",
+    "romanized": "srei",
+    "phonetic": "SRAY",
+    "frequency": 85
+  },
+  {
+    "khmer": "ប្រុស",
+    "english": "male",
+    "pos": "noun",
+    "romanized": "brŏ-sâ",
+    "phonetic": "BRO-SA",
+    "frequency": 85
+  },
+  {
+    "khmer": "ពេញ",
+    "english": "full",
+    "pos": "adj",
+    "romanized": "pé-ñô",
+    "phonetic": "PAY-NYO",
+    "frequency": 75
+  },
+  {
+    "khmer": "ទទេ",
+    "english": "empty",
+    "pos": "adj",
+    "romanized": "tté",
+    "phonetic": "TTAY",
+    "frequency": 70
+  },
+  {
+    "khmer": "ជ្រៅ",
+    "english": "deep",
+    "pos": "adj",
+    "romanized": "chrŏu",
+    "phonetic": "CHROU",
+    "frequency": 65
+  },
+  {
+    "khmer": "រាក់",
+    "english": "shallow",
+    "pos": "adj",
+    "romanized": "rā-kâ",
+    "phonetic": "RAH-KA",
+    "frequency": 60
+  },
+  {
+    "khmer": "ខ្ពស់",
+    "english": "tall/high",
+    "pos": "adj",
+    "romanized": "khpâ-sâ",
+    "phonetic": "KHPA-SA",
+    "frequency": 80
+  },
+  {
+    "khmer": "ទាប",
+    "english": "short/low",
+    "pos": "adj",
+    "romanized": "tā-bâ",
+    "phonetic": "TAH-BA",
+    "frequency": 75
+  },
+  {
+    "khmer": "វែង",
+    "english": "long",
+    "pos": "adj",
+    "romanized": "vê-ngô",
+    "phonetic": "VEH-NGO",
+    "frequency": 80
+  },
+  {
+    "khmer": "ខ្លី",
+    "english": "short (length)",
+    "pos": "adj",
+    "romanized": "khlei",
+    "phonetic": "KHLAY",
+    "frequency": 75
+  },
+  {
+    "khmer": "ធាត់",
+    "english": "fat",
+    "pos": "adj",
+    "romanized": "thā-tâ",
+    "phonetic": "THAH-TA",
+    "frequency": 65
+  },
+  {
+    "khmer": "ស្គម",
+    "english": "thin",
+    "pos": "adj",
+    "romanized": "skâ-mô",
+    "phonetic": "SKA-MO",
+    "frequency": 65
+  },
+  {
+    "khmer": "ក្លាហាន",
+    "english": "brave",
+    "pos": "adj",
+    "romanized": "klā-hā-nô",
+    "phonetic": "KLAH-HAH-NO",
+    "frequency": 60
+  },
+  {
+    "khmer": "ខ្លាច",
+    "english": "afraid",
+    "pos": "adj",
+    "romanized": "khlā-châ",
+    "phonetic": "KHLAH-CHA",
+    "frequency": 75
+  },
+  {
+    "khmer": "រីករាយ",
+    "english": "happy",
+    "pos": "adj",
+    "romanized": "rī-krā-yô",
+    "phonetic": "REE-KRAH-YO",
+    "frequency": 80
+  },
+  {
+    "khmer": "ក្រៀមក្រំ",
+    "english": "sad",
+    "pos": "adj",
+    "romanized": "kriĕ-mkrâm",
+    "phonetic": "KRIA-MKRAM",
+    "frequency": 70
+  },
+  {
+    "khmer": "ខឹង",
+    "english": "angry",
+    "pos": "adj",
+    "romanized": "khœ̆-ngô",
+    "phonetic": "KHEU-NGO",
+    "frequency": 75
+  },
+  {
+    "khmer": "អស់",
+    "english": "finished/out of",
+    "pos": "adj",
+    "romanized": "'sâ",
+    "phonetic": "SA",
+    "frequency": 80
+  },
+  {
+    "khmer": "នៅសល់",
+    "english": "remaining",
+    "pos": "adj",
+    "romanized": "nŏu-slô",
+    "phonetic": "NOU-SLO",
+    "frequency": 65
+  },
+  {
+    "khmer": "ឡាន",
+    "english": "car",
+    "pos": "noun",
+    "romanized": "lā-nô",
+    "phonetic": "LAH-NO",
+    "frequency": 85
+  },
+  {
+    "khmer": "ម៉ូតូ",
+    "english": "motorcycle",
+    "pos": "noun",
+    "romanized": "mo-to",
+    "phonetic": "MOH-TOH",
+    "frequency": 85
+  },
+  {
+    "khmer": "កង់",
+    "english": "bicycle",
+    "pos": "noun",
+    "romanized": "kngô",
+    "phonetic": "KNGO",
+    "frequency": 75
+  },
+  {
+    "khmer": "ទូរស័ព្ទ",
+    "english": "phone",
+    "pos": "noun",
+    "romanized": "tū-rsptô",
+    "phonetic": "TOO-RSPTO",
+    "frequency": 90
+  },
+  {
+    "khmer": "កុំព្យូទ័រ",
+    "english": "computer",
+    "pos": "noun",
+    "romanized": "kŏm-pyū-trô",
+    "phonetic": "KOM-PYOO-TRO",
+    "frequency": 80
+  },
+  {
+    "khmer": "សៀវភៅ",
+    "english": "book",
+    "pos": "noun",
+    "romanized": "siĕ-vphŏu",
+    "phonetic": "SIA-VPHOU",
+    "frequency": 80
+  },
+  {
+    "khmer": "មេរៀន",
+    "english": "lesson",
+    "pos": "noun",
+    "romanized": "mé-riĕ-nô",
+    "phonetic": "MAY-RIA-NO",
+    "frequency": 70
+  },
+  {
+    "khmer": "បន្ទប់",
+    "english": "room",
+    "pos": "noun",
+    "romanized": "bntô-bâ",
+    "phonetic": "BNTO-BA",
+    "frequency": 80
+  },
+  {
+    "khmer": "ទ្វារ",
+    "english": "door",
+    "pos": "noun",
+    "romanized": "tvā-rô",
+    "phonetic": "TVAH-RO",
+    "frequency": 75
+  },
+  {
+    "khmer": "បង្អួច",
+    "english": "window",
+    "pos": "noun",
+    "romanized": "bng'uŏ-châ",
+    "phonetic": "BNGUO-CHA",
+    "frequency": 70
+  },
+  {
+    "khmer": "ដំបូល",
+    "english": "roof",
+    "pos": "noun",
+    "romanized": "dâm-bo-lô",
+    "phonetic": "DAM-BOH-LO",
+    "frequency": 60
+  },
+  {
+    "khmer": "ជណ្ដើរ",
+    "english": "stairs",
+    "pos": "noun",
+    "romanized": "chndaeu-rô",
+    "phonetic": "CHNDEU-RO",
+    "frequency": 60
+  },
+  {
+    "khmer": "សម្លៀកបំពាក់",
+    "english": "clothes",
+    "pos": "noun",
+    "romanized": "smliĕ-kbâm-pā-kâ",
+    "phonetic": "SMLIA-KBAM-PAH-KA",
+    "frequency": 75
+  },
+  {
+    "khmer": "ស្បែកជើង",
+    "english": "shoes",
+    "pos": "noun",
+    "romanized": "sbê-kcheu-ngô",
+    "phonetic": "SBEH-KCHEU-NGO",
+    "frequency": 70
+  },
+  {
+    "khmer": "ក្រដាស",
+    "english": "paper",
+    "pos": "noun",
+    "romanized": "krâ-dā-sâ",
+    "phonetic": "KRA-DAH-SA",
+    "frequency": 75
+  },
+  {
+    "khmer": "ប៊ិច",
+    "english": "pen",
+    "pos": "noun",
+    "romanized": "bĭ-châ",
+    "phonetic": "BI-CHA",
+    "frequency": 70
+  },
+  {
+    "khmer": "វ៉ែនតា",
+    "english": "glasses",
+    "pos": "noun",
+    "romanized": "vê-ntā",
+    "phonetic": "VEH-NTAH",
+    "frequency": 65
+  },
+  {
+    "khmer": "អាកាសធាតុ",
+    "english": "weather",
+    "pos": "noun",
+    "romanized": "'ā-kā-sthā-tŏ",
+    "phonetic": "AH-KAH-STHAH-TO",
+    "frequency": 70
+  },
+  {
+    "khmer": "ព្រះអាទិត្យ",
+    "english": "sun",
+    "pos": "noun",
+    "romanized": "prôh-'ā-tĭ-tyâ",
+    "phonetic": "PROH-AH-TI-TYA",
+    "frequency": 75
+  },
+  {
+    "khmer": "ព្រះច័ន្ទ",
+    "english": "moon",
+    "pos": "noun",
+    "romanized": "prôh-chntô",
+    "phonetic": "PROH-CHNTO",
+    "frequency": 70
+  },
+  {
+    "khmer": "ផ្កាយ",
+    "english": "star",
+    "pos": "noun",
+    "romanized": "phkā-yô",
+    "phonetic": "PHKAH-YO",
+    "frequency": 65
+  },
+  {
+    "khmer": "ភ្លៀង",
+    "english": "rain",
+    "pos": "noun",
+    "romanized": "phliĕ-ngô",
+    "phonetic": "PHLIA-NGO",
+    "frequency": 80
+  },
+  {
+    "khmer": "ខ្យល់",
+    "english": "wind",
+    "pos": "noun",
+    "romanized": "khyâ-lô",
+    "phonetic": "KHYA-LO",
+    "frequency": 75
+  },
+  {
+    "khmer": "ពពក",
+    "english": "cloud",
+    "pos": "noun",
+    "romanized": "ppkâ",
+    "phonetic": "PPKA",
+    "frequency": 65
+  },
+  {
+    "khmer": "ដី",
+    "english": "ground/land",
+    "pos": "noun",
+    "romanized": "dei",
+    "phonetic": "DAY",
+    "frequency": 80
+  },
+  {
+    "khmer": "មេឃ",
+    "english": "sky",
+    "pos": "noun",
+    "romanized": "mé-khô",
+    "phonetic": "MAY-KHO",
+    "frequency": 70
+  },
+  {
+    "khmer": "ភ្នំ",
+    "english": "mountain",
+    "pos": "noun",
+    "romanized": "phnôm",
+    "phonetic": "PHNOM",
+    "frequency": 70
+  },
+  {
+    "khmer": "សមុទ្រ",
+    "english": "sea/ocean",
+    "pos": "noun",
+    "romanized": "smŭ-trô",
+    "phonetic": "SMU-TRO",
+    "frequency": 70
+  },
+  {
+    "khmer": "ទន្លេ",
+    "english": "river",
+    "pos": "noun",
+    "romanized": "tnlé",
+    "phonetic": "TNLAY",
+    "frequency": 75
+  },
+  {
+    "khmer": "បឹង",
+    "english": "lake",
+    "pos": "noun",
+    "romanized": "bœ̆-ngô",
+    "phonetic": "BEU-NGO",
+    "frequency": 65
+  },
+  {
+    "khmer": "ព្រៃ",
+    "english": "forest",
+    "pos": "noun",
+    "romanized": "prey",
+    "phonetic": "PREY",
+    "frequency": 65
+  },
+  {
+    "khmer": "ដើមឈើ",
+    "english": "tree",
+    "pos": "noun",
+    "romanized": "daeu-mchheu",
+    "phonetic": "DEU-MCHHEU",
+    "frequency": 75
+  },
+  {
+    "khmer": "ផ្កា",
+    "english": "flower",
+    "pos": "noun",
+    "romanized": "phkā",
+    "phonetic": "PHKAH",
+    "frequency": 70
+  },
+  {
+    "khmer": "ក្បាល",
+    "english": "head",
+    "pos": "noun",
+    "romanized": "kbā-lô",
+    "phonetic": "KBAH-LO",
+    "frequency": 80
+  },
+  {
+    "khmer": "ភ្នែក",
+    "english": "eye",
+    "pos": "noun",
+    "romanized": "phnê-kâ",
+    "phonetic": "PHNEH-KA",
+    "frequency": 80
+  },
+  {
+    "khmer": "ត្រចៀក",
+    "english": "ear",
+    "pos": "noun",
+    "romanized": "trâ-chiĕ-kâ",
+    "phonetic": "TRA-CHIA-KA",
+    "frequency": 75
+  },
+  {
+    "khmer": "ច្រមុះ",
+    "english": "nose",
+    "pos": "noun",
+    "romanized": "chrâ-mŭh",
+    "phonetic": "CHRA-MUH",
+    "frequency": 75
+  },
+  {
+    "khmer": "មាត់",
+    "english": "mouth",
+    "pos": "noun",
+    "romanized": "mā-tâ",
+    "phonetic": "MAH-TA",
+    "frequency": 80
+  },
+  {
+    "khmer": "ធ្មេញ",
+    "english": "tooth",
+    "pos": "noun",
+    "romanized": "thmé-ñô",
+    "phonetic": "THMAY-NYO",
+    "frequency": 70
+  },
+  {
+    "khmer": "អណ្ដាត",
+    "english": "tongue",
+    "pos": "noun",
+    "romanized": "'ndā-tâ",
+    "phonetic": "NDAH-TA",
+    "frequency": 65
+  },
+  {
+    "khmer": "ដៃ",
+    "english": "hand/arm",
+    "pos": "noun",
+    "romanized": "dai",
+    "phonetic": "DAI",
+    "frequency": 85
+  },
+  {
+    "khmer": "ជើង",
+    "english": "foot/leg",
+    "pos": "noun",
+    "romanized": "cheu-ngô",
+    "phonetic": "CHEU-NGO",
+    "frequency": 85
+  },
+  {
+    "khmer": "ក",
+    "english": "neck",
+    "pos": "noun",
+    "romanized": "kâ",
+    "phonetic": "KA",
+    "frequency": 65
+  },
+  {
+    "khmer": "ស្មា",
+    "english": "shoulder",
+    "pos": "noun",
+    "romanized": "smā",
+    "phonetic": "SMAH",
+    "frequency": 65
+  },
+  {
+    "khmer": "ខ្នង",
+    "english": "back",
+    "pos": "noun",
+    "romanized": "khnâ-ngô",
+    "phonetic": "KHNA-NGO",
+    "frequency": 70
+  },
+  {
+    "khmer": "ពោះ",
+    "english": "stomach",
+    "pos": "noun",
+    "romanized": "poh",
+    "phonetic": "POHH",
+    "frequency": 75
+  },
+  {
+    "khmer": "បេះដូង",
+    "english": "heart",
+    "pos": "noun",
+    "romanized": "béh-do-ngô",
+    "phonetic": "BAYH-DOH-NGO",
+    "frequency": 75
+  },
+  {
+    "khmer": "សប្ដាហ៍",
+    "english": "week",
+    "pos": "noun",
+    "romanized": "sbdā-hâ",
+    "phonetic": "SBDAH-HA",
+    "frequency": 80
+  },
+  {
+    "khmer": "ខែ",
+    "english": "month",
+    "pos": "noun",
+    "romanized": "khê",
+    "phonetic": "KHEH",
+    "frequency": 85
+  },
+  {
+    "khmer": "ឆ្នាំ",
+    "english": "year",
+    "pos": "noun",
+    "romanized": "chhnām",
+    "phonetic": "CHHNAHM",
+    "frequency": 90
+  },
+  {
+    "khmer": "រដូវ",
+    "english": "season",
+    "pos": "noun",
+    "romanized": "rdo-vô",
+    "phonetic": "RDOH-VO",
+    "frequency": 65
+  },
+  {
+    "khmer": "ជានិច្ច",
+    "english": "always",
+    "pos": "adv",
+    "romanized": "chā-nĭ-chchâ",
+    "phonetic": "CHAH-NI-CHCHA",
+    "frequency": 75
+  },
+  {
+    "khmer": "ជារៀងរហូត",
+    "english": "forever",
+    "pos": "adv",
+    "romanized": "chā-riĕ-ngrho-tâ",
+    "phonetic": "CHAH-RIA-NGRHOH-TA",
+    "frequency": 60
+  },
+  {
+    "khmer": "ពេលខ្លះ",
+    "english": "sometimes",
+    "pos": "adv",
+    "romanized": "pé-lkhlâh",
+    "phonetic": "PAY-LKHLAH",
+    "frequency": 75
+  },
+  {
+    "khmer": "មិនដែល",
+    "english": "never",
+    "pos": "adv",
+    "romanized": "mĭ-ndê-lô",
+    "phonetic": "MI-NDEH-LO",
+    "frequency": 75
+  },
+  {
+    "khmer": "អី​ៗ",
+    "english": "whatever",
+    "pos": "pron",
+    "romanized": "'ei",
+    "phonetic": "AY",
+    "frequency": 60
+  },
+  {
+    "khmer": "អំពី",
+    "english": "about/around",
+    "pos": "prep",
+    "romanized": "'âm-pī",
+    "phonetic": "AM-PEE",
+    "frequency": 75
+  },
+  {
+    "khmer": "តាម",
+    "english": "follow/according to",
+    "pos": "prep",
+    "romanized": "tā-mô",
+    "phonetic": "TAH-MO",
+    "frequency": 80
+  },
+  {
+    "khmer": "រហូត",
+    "english": "until",
+    "pos": "prep",
+    "romanized": "rho-tâ",
+    "phonetic": "RHOH-TA",
+    "frequency": 70
+  },
+  {
+    "khmer": "ដោយ",
+    "english": "by/with",
+    "pos": "prep",
+    "romanized": "dau-yô",
+    "phonetic": "DAO-YO",
+    "frequency": 80
+  },
+  {
+    "khmer": "សម្រាប់",
+    "english": "for",
+    "pos": "prep",
+    "romanized": "smrā-bâ",
+    "phonetic": "SMRAH-BA",
+    "frequency": 85
+  },
+  {
+    "khmer": "ជាមួយ",
+    "english": "with/together",
+    "pos": "prep",
+    "romanized": "chā-muŏ-yô",
+    "phonetic": "CHAH-MUO-YO",
+    "frequency": 85
+  },
+  {
+    "khmer": "គ្មាន",
+    "english": "without/no",
+    "pos": "adj",
+    "romanized": "kmā-nô",
+    "phonetic": "KMAH-NO",
+    "frequency": 85
+  },
+  {
+    "khmer": "ដោយសារ",
+    "english": "because of",
+    "pos": "conj",
+    "romanized": "dau-ysā-rô",
+    "phonetic": "DAO-YSAH-RO",
+    "frequency": 70
+  },
+  {
+    "khmer": "ទោះបី",
+    "english": "although",
+    "pos": "conj",
+    "romanized": "toh-bei",
+    "phonetic": "TOHH-BAY",
+    "frequency": 65
+  },
+  {
+    "khmer": "បើ",
+    "english": "if",
+    "pos": "conj",
+    "romanized": "baeu",
+    "phonetic": "BEU",
+    "frequency": 85
+  },
+  {
+    "khmer": "ដូច",
+    "english": "like/as",
+    "pos": "conj",
+    "romanized": "do-châ",
+    "phonetic": "DOH-CHA",
+    "frequency": 80
+  },
+  {
+    "khmer": "ពណ៌",
+    "english": "color",
+    "pos": "noun",
+    "romanized": "pnâ",
+    "phonetic": "PNA",
+    "frequency": 70
+  },
+  {
+    "khmer": "ក្រហម",
+    "english": "red",
+    "pos": "adj",
+    "romanized": "krâ-hmô",
+    "phonetic": "KRA-HMO",
+    "frequency": 75
+  },
+  {
+    "khmer": "លឿង",
+    "english": "yellow",
+    "pos": "adj",
+    "romanized": "lœă-ngô",
+    "phonetic": "LEUA-NGO",
+    "frequency": 70
+  },
+  {
+    "khmer": "បៃតង",
+    "english": "green",
+    "pos": "adj",
+    "romanized": "bai-tngô",
+    "phonetic": "BAI-TNGO",
+    "frequency": 70
+  },
+  {
+    "khmer": "ខៀវ",
+    "english": "blue",
+    "pos": "adj",
+    "romanized": "khiĕ-vô",
+    "phonetic": "KHIA-VO",
+    "frequency": 70
+  },
+  {
+    "khmer": "ស",
+    "english": "white",
+    "pos": "adj",
+    "romanized": "sâ",
+    "phonetic": "SA",
+    "frequency": 75
+  },
+  {
+    "khmer": "ខ្មៅ",
+    "english": "black",
+    "pos": "adj",
+    "romanized": "khmau",
+    "phonetic": "KHMAO",
+    "frequency": 75
+  }
+]

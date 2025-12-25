@@ -43,6 +43,30 @@
 
 .rom-item {
   display: inline;
+  padding: 0.125rem 0.25rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.rom-item:hover {
+  background: var(--syllable-bg, rgba(0, 122, 255, 0.08));
+}
+
+.rom-item.highlighted {
+  background: var(--syllable-bg, rgba(0, 122, 255, 0.15));
+  box-shadow: 0 0 0 2px var(--syllable-accent, var(--color-accent));
+  animation: romPulse 1s ease-in-out infinite;
+}
+
+@keyframes romPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 2px var(--syllable-accent, var(--color-accent));
+  }
+  50% {
+    box-shadow: 0 0 0 4px var(--syllable-accent, var(--color-accent));
+  }
 }
 
 .rom-space {

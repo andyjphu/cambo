@@ -104,3 +104,106 @@ export function getSoftRainbowColor(index: number): string {
   return softRainbowPalette[index % softRainbowPalette.length];
 }
 
+// Apple System UI colors for syllable-based highlighting
+// Each syllable gets a unique color family
+// Background shades vary by component type (darker = base consonant, lighter = diacritics)
+export const syllableColorPalette = [
+  { // Blue
+    accent: '#007AFF',
+    bgDark: 'rgba(0, 122, 255, 0.25)',    // Base consonant
+    bgMedium: 'rgba(0, 122, 255, 0.15)',  // Subscript/coeng
+    bgLight: 'rgba(0, 122, 255, 0.08)',   // Vowel/sign
+  },
+  { // Green
+    accent: '#34C759',
+    bgDark: 'rgba(52, 199, 89, 0.25)',
+    bgMedium: 'rgba(52, 199, 89, 0.15)',
+    bgLight: 'rgba(52, 199, 89, 0.08)',
+  },
+  { // Purple
+    accent: '#AF52DE',
+    bgDark: 'rgba(175, 82, 222, 0.25)',
+    bgMedium: 'rgba(175, 82, 222, 0.15)',
+    bgLight: 'rgba(175, 82, 222, 0.08)',
+  },
+  { // Orange
+    accent: '#FF9500',
+    bgDark: 'rgba(255, 149, 0, 0.25)',
+    bgMedium: 'rgba(255, 149, 0, 0.15)',
+    bgLight: 'rgba(255, 149, 0, 0.08)',
+  },
+  { // Pink
+    accent: '#FF2D55',
+    bgDark: 'rgba(255, 45, 85, 0.25)',
+    bgMedium: 'rgba(255, 45, 85, 0.15)',
+    bgLight: 'rgba(255, 45, 85, 0.08)',
+  },
+  { // Indigo
+    accent: '#5856D6',
+    bgDark: 'rgba(88, 86, 214, 0.25)',
+    bgMedium: 'rgba(88, 86, 214, 0.15)',
+    bgLight: 'rgba(88, 86, 214, 0.08)',
+  },
+  { // Teal
+    accent: '#00C7BE',
+    bgDark: 'rgba(0, 199, 190, 0.25)',
+    bgMedium: 'rgba(0, 199, 190, 0.15)',
+    bgLight: 'rgba(0, 199, 190, 0.08)',
+  },
+  { // Red
+    accent: '#FF3B30',
+    bgDark: 'rgba(255, 59, 48, 0.25)',
+    bgMedium: 'rgba(255, 59, 48, 0.15)',
+    bgLight: 'rgba(255, 59, 48, 0.08)',
+  },
+];
+
+export interface SyllableColor {
+  accent: string;    // Accent color for borders/highlights
+  bgDark: string;    // Background for base consonant
+  bgMedium: string;  // Background for subscript/coeng
+  bgLight: string;   // Background for vowel/sign
+}
+
+/**
+ * Get syllable color scheme based on cluster index
+ */
+export function getSyllableColor(clusterIndex: number): SyllableColor {
+  return syllableColorPalette[clusterIndex % syllableColorPalette.length];
+}
+
+/**
+ * Get component BACKGROUND color within a syllable based on component type
+ * Text color stays consistent (readable), background varies
+ */
+export function getComponentBgColor(
+  clusterIndex: number, 
+  componentType: keyof typeof charTypeColors
+): string {
+  const syllable = getSyllableColor(clusterIndex);
+  
+  switch (componentType) {
+    case 'consonant':
+    case 'indep_vowel':
+      return syllable.bgDark;
+    case 'subscript':
+    case 'coeng':
+      return syllable.bgMedium;
+    case 'vowel':
+    case 'sign':
+    case 'numeral':
+      return syllable.bgLight;
+    case 'space':
+      return 'transparent';
+    default:
+      return syllable.bgMedium;
+  }
+}
+
+/**
+ * Get accent color for syllable (for borders, highlights)
+ */
+export function getSyllableAccent(clusterIndex: number): string {
+  return getSyllableColor(clusterIndex).accent;
+}
+

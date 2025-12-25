@@ -10,7 +10,7 @@ interface ConfidenceWarningProps {
 export function ConfidenceWarning({ level, warnings, inline = false }: ConfidenceWarningProps) {
   const [showTooltip, setShowTooltip] = useState(false);
   
-  if (level === 'high' || warnings.length === 0) {
+  if (level === 'high' || (warnings !== undefined && warnings.length === 0)) {
     return null;
   }
   
@@ -50,7 +50,7 @@ export function ConfidenceWarning({ level, warnings, inline = false }: Confidenc
               }
             </p>
             <ul className="warning-list">
-              {warnings.map((warning, i) => (
+              {warnings !== undefined && warnings.map((warning, i) => (
                 <li key={i}>{warning}</li>
               ))}
             </ul>
