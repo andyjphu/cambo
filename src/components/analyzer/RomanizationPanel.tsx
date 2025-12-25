@@ -12,23 +12,23 @@ interface RomanizationPanelProps {
   clusters: KhmerCluster[];
   activeClusterIdx: number | null;
   onClusterHover: (clusterIdx: number | null) => void;
-  onClusterClick: (clusterIdx: number) => void;
+  onClusterClick: (clusterIdx: number, compIdx: number | null, source: 'input' | 'analysis') => void;
   getNonSpaceIdx: (clusterIdx: number) => number;
 }
 
-export function RomanizationPanel({ 
-  text, 
-  clusters, 
-  activeClusterIdx, 
-  onClusterHover, 
+export function RomanizationPanel({
+  text,
+  clusters,
+  activeClusterIdx,
+  onClusterHover,
   onClusterClick,
   getNonSpaceIdx,
 }: RomanizationPanelProps) {
   const { settings } = useSettings();
-  
+
   const romanizedData = useMemo(() => {
     if (!text.trim()) return [];
-    
+
     const result: Array<{
       khmer: string;
       romanized: string;
@@ -39,7 +39,7 @@ export function RomanizationPanel({
       isSpace: boolean;
       clusterIdx: number;
     }> = [];
-    
+
     clusters.forEach((cluster, clusterIdx) => {
       if (cluster.type === 'space') {
         result.push({
@@ -53,7 +53,7 @@ export function RomanizationPanel({
         });
         return;
       }
-      
+
       // Check dictionary first
       const dictEntry = lookupKhmer(cluster.text);
       if (dictEntry) {
@@ -81,16 +81,16 @@ export function RomanizationPanel({
         });
       }
     });
-    
+
     return result;
   }, [text, clusters]);
-  
+
   if (!settings.showRomanizationPanel || !text.trim()) {
     return null;
   }
-  
+
   const showIPA = settings.pronunciationMode === 'ipa';
-  
+
   return (
     <div className="romanization-panel">
       <div className="panel-header">
@@ -102,14 +102,14 @@ export function RomanizationPanel({
           if (item.isSpace) {
             return <span key={idx} className="rom-space"> </span>;
           }
-          
+
           const nonSpaceIdx = getNonSpaceIdx(item.clusterIdx);
           const syllableColor = getSyllableColor(nonSpaceIdx);
           const isHighlighted = activeClusterIdx === item.clusterIdx;
-          
+
           return (
-            <span 
-              key={idx} 
+            <span
+              key={idx}
               className={`rom-item romanization-cluster ${isHighlighted ? 'highlighted' : ''}`}
               style={{
                 '--syllable-accent': syllableColor.accent,
@@ -119,15 +119,15 @@ export function RomanizationPanel({
               onMouseLeave={() => onClusterHover(null)}
               onClick={(e) => {
                 e.stopPropagation();
-                onClusterClick(item.clusterIdx);
+                onClusterClick(item.clusterIdx, null, 'input');
               }}
             >
               <span className="rom-phonetic">
                 {showIPA ? item.romanized : item.phonetic}
-                <ConfidenceWarning 
-                  level={item.confidence} 
-                  warnings={item.warnings} 
-                  inline 
+                <ConfidenceWarning
+                  level={item.confidence}
+                  warnings={item.warnings}
+                  inline
                 />
               </span>
               {item.english && (

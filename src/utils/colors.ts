@@ -15,7 +15,7 @@ export const appleColors = {
   purple: '#AF52DE',
   pink: '#FF2D55',
   brown: '#A2845E',
-  
+
   // Grays
   gray: '#8E8E93',
   gray2: '#AEAEB2',
@@ -23,12 +23,12 @@ export const appleColors = {
   gray4: '#D1D1D6',
   gray5: '#E5E5EA',
   gray6: '#F2F2F7',
-  
+
   // System colors
   systemBackground: '#FFFFFF',
   secondaryBackground: '#F2F2F7',
   tertiaryBackground: '#FFFFFF',
-  
+
   // Label colors
   label: '#000000',
   secondaryLabel: '#3C3C43',
@@ -165,6 +165,14 @@ export interface SyllableColor {
   bgLight: string;   // Background for vowel/sign
 }
 
+// Orange color scheme for Seanghay dataset words (without English translations)
+export const seanghayDataColor: SyllableColor = {
+  accent: '#FF9500',  // Apple orange
+  bgDark: 'rgba(255, 149, 0, 0.28)',
+  bgMedium: 'rgba(255, 149, 0, 0.18)',
+  bgLight: 'rgba(255, 149, 0, 0.10)',
+};
+
 /**
  * Get syllable color scheme based on cluster index
  */
@@ -177,11 +185,11 @@ export function getSyllableColor(clusterIndex: number): SyllableColor {
  * Text color stays consistent (readable), background varies
  */
 export function getComponentBgColor(
-  clusterIndex: number, 
+  clusterIndex: number,
   componentType: keyof typeof charTypeColors
 ): string {
   const syllable = getSyllableColor(clusterIndex);
-  
+
   switch (componentType) {
     case 'consonant':
     case 'indep_vowel':

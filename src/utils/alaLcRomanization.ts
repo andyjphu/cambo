@@ -9,9 +9,9 @@
 import type { KhmerComponent, KhmerCharType } from './khmerParser';
 
 // Consonant romanization (ALA-LC standard)
-export const consonantRomanization: Record<string, { 
-  initial: string; 
-  final: string; 
+export const consonantRomanization: Record<string, {
+  initial: string;
+  final: string;
   series: 1 | 2;
   name: string;
 }> = {
@@ -51,8 +51,8 @@ export const consonantRomanization: Record<string, {
 };
 
 // Vowel romanization based on series (1 = "a" series, 2 = "o" series)
-export const vowelRomanization: Record<string, { 
-  series1: string; 
+export const vowelRomanization: Record<string, {
+  series1: string;
   series2: string;
   name: string;
 }> = {
@@ -85,49 +85,49 @@ export const signEffects: Record<string, {
   name: string;
   description: string;
 }> = {
-  'ំ': { 
-    effect: 'nasal', 
-    append: 'm', 
+  'ំ': {
+    effect: 'nasal',
+    append: 'm',
     romanized: 'm',
     phonetic: 'M',
     name: 'nikahit',
-    description: 'Nasal final - adds "m" sound to end of syllable' 
+    description: 'Nasal final - adds "m" sound to end of syllable'
   },
-  'ះ': { 
-    effect: 'aspirate', 
-    append: 'h', 
+  'ះ': {
+    effect: 'aspirate',
+    append: 'h',
     romanized: 'h',
     phonetic: 'H',
     name: 'reahmuk',
-    description: 'Aspirated final - adds breathy "h" to end of syllable' 
+    description: 'Aspirated final - adds breathy "h" to end of syllable'
   },
-  '់': { 
-    effect: 'stop', 
+  '់': {
+    effect: 'stop',
     romanized: '̆',
     phonetic: '(short)',
     name: 'bantoc',
-    description: 'Vowel shortener - makes the vowel short/clipped' 
+    description: 'Vowel shortener - makes the vowel short/clipped'
   },
-  '៉': { 
-    effect: 'register', 
+  '៉': {
+    effect: 'register',
     romanized: '°',
     phonetic: '(1st)',
     name: 'musĕkâtônd',
-    description: 'Series shifter - converts 2nd series consonant to 1st series sound' 
+    description: 'Series shifter - converts 2nd series consonant to 1st series sound'
   },
-  '៊': { 
-    effect: 'register', 
+  '៊': {
+    effect: 'register',
     romanized: '°',
     phonetic: '(2nd)',
     name: 'trĕysâp',
-    description: 'Series shifter - converts 1st series consonant to 2nd series sound' 
+    description: 'Series shifter - converts 1st series consonant to 2nd series sound'
   },
-  '្': { 
-    effect: 'none', 
+  '្': {
+    effect: 'none',
     romanized: '͓',
     phonetic: '(sub)',
     name: 'coeng',
-    description: 'Subscript marker - indicates next consonant is pronounced as a cluster' 
+    description: 'Subscript marker - indicates next consonant is pronounced as a cluster'
   },
 };
 
@@ -146,13 +146,12 @@ export function romanizeCluster(components: KhmerComponent[]): RomanizationResul
   let romanized = '';
   let phonetic = '';
   let confidence: 'high' | 'medium' | 'low' = 'high';
-  
+
   // Find the base consonant and determine series
   let baseSeries: 1 | 2 = 1;
   let hasExplicitVowel = false;
-  let hasRegisterShift = false;
   let hasFinal = false;
-  
+
   // First pass: analyze structure
   for (const comp of components) {
     if (comp.type === 'consonant') {
@@ -164,28 +163,27 @@ export function romanizeCluster(components: KhmerComponent[]): RomanizationResul
     if (comp.type === 'vowel') {
       hasExplicitVowel = true;
     }
+    // Register shift signs override the consonant's inherent series
     if (comp.type === 'sign') {
       if (comp.char === '៉') {
-        hasRegisterShift = true;
-        baseSeries = 1;
+        baseSeries = 1; // Muusikatoan - shift to series 1
       } else if (comp.char === '៊') {
-        hasRegisterShift = true;
-        baseSeries = 2;
+        baseSeries = 2; // Triisap - shift to series 2
       }
     }
     if (comp.type === 'subscript') {
       hasFinal = true;
     }
   }
-  
+
   // Second pass: build romanization
   let consonantCount = 0;
   let vowelPart = '';
   let signParts: string[] = [];
-  
+
   for (let i = 0; i < components.length; i++) {
     const comp = components[i];
-    
+
     if (comp.type === 'consonant') {
       const info = consonantRomanization[comp.char];
       if (info) {
@@ -199,7 +197,7 @@ export function romanizeCluster(components: KhmerComponent[]): RomanizationResul
         confidence = 'low';
       }
     }
-    
+
     if (comp.type === 'subscript') {
       const info = consonantRomanization[comp.char];
       if (info) {
@@ -208,7 +206,7 @@ export function romanizeCluster(components: KhmerComponent[]): RomanizationResul
         phonetic += toPhonetic(info.initial);
       }
     }
-    
+
     if (comp.type === 'vowel') {
       const vInfo = vowelRomanization[comp.char];
       if (vInfo) {
@@ -218,7 +216,7 @@ export function romanizeCluster(components: KhmerComponent[]): RomanizationResul
         confidence = 'medium';
       }
     }
-    
+
     if (comp.type === 'sign') {
       const sInfo = signEffects[comp.char];
       if (sInfo) {
@@ -231,7 +229,7 @@ export function romanizeCluster(components: KhmerComponent[]): RomanizationResul
       }
     }
   }
-  
+
   // Add vowel (or inherent vowel if none explicit)
   if (!hasExplicitVowel && consonantCount > 0) {
     const inherent = vowelRomanization[''];
@@ -241,19 +239,19 @@ export function romanizeCluster(components: KhmerComponent[]): RomanizationResul
       if (confidence === 'high') confidence = 'medium';
     }
   }
-  
+
   romanized += vowelPart;
   phonetic += toPhoneticVowel(vowelPart);
-  
+
   // Add sign effects
   for (const sign of signParts) {
     romanized += sign;
     phonetic += sign;
   }
-  
+
   // Clean up phonetic for readability
   phonetic = cleanPhonetic(phonetic);
-  
+
   return {
     romanized: romanized || '?',
     phonetic: phonetic || '?',
@@ -378,7 +376,7 @@ export function getCharRomanization(char: string, type: KhmerCharType): {
 /**
  * Full text romanization
  */
-export function romanizeText(text: string, clusters: Array<{ components: KhmerComponent[]; type: string }>): string {
+export function romanizeText(_text: string, clusters: Array<{ components: KhmerComponent[]; type: string }>): string {
   return clusters
     .filter(c => c.type !== 'space')
     .map(cluster => {

@@ -2,8 +2,9 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { useSettings } from '../context/SettingsContext';
 import { parseKhmerText, type KhmerCluster, type KhmerCharType } from '../utils/khmerParser';
 import { romanizeCluster, getCharRomanization } from '../utils/alaLcRomanization';
-import { lookupKhmer, type DictionaryEntry } from '../utils/dictionaryCore';
-import { getSyllableColor, getComponentBgColor, getSyllableAccent } from '../utils/colors';
+import { lookupKhmer } from '../utils/dictionaryCore';
+import { segmentText, segmentedToText } from '../utils/wordSegmentation';
+import { getSyllableColor, seanghayDataColor, type SyllableColor } from '../utils/colors';
 import { RomanizationPanel } from '../components/analyzer/RomanizationPanel';
 import { ConfidenceWarning } from '../components/analyzer/ConfidenceWarning';
 import { SpaceEditor } from '../components/analyzer/SpaceEditor';
@@ -39,7 +40,19 @@ export function AnalyzePage() {
   const { settings } = useSettings();
   const [inputText, setInputText] = useState('សួស្តី ខ្ញុំ ស្រឡាញ់ កម្ពុជា');
   const [isEditMode, setIsEditMode] = useState(true);
-  
+
+  // Handler to confirm text and apply automatic segmentation
+  const handleConfirmText = useCallback(() => {
+    // Remove existing spaces and apply automatic segmentation
+    const cleanText = inputText.replace(/\s+/g, '');
+    if (cleanText) {
+      const result = segmentText(cleanText);
+      const segmentedText = segmentedToText(result.words);
+      setInputText(segmentedText);
+    }
+    setIsEditMode(false);
+  }, [inputText]);
+
   // Two-level highlighting system:
   // - Cluster level: highlights the full syllable (for Khmer Text box, Romanization)
   // - Component level: highlights individual character (for Character Analysis detail)
@@ -47,12 +60,14 @@ export function AnalyzePage() {
   const [hoveredCompIdx, setHoveredCompIdx] = useState<number | null>(null); // Component within hovered cluster
   const [lockedClusterIdx, setLockedClusterIdx] = useState<number | null>(null);
   const [lockedCompIdx, setLockedCompIdx] = useState<number | null>(null);
-  
+
   const charAnalysisRef = useRef<HTMLDivElement>(null);
-  const clusterRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
+  const clusterRefs = useRef<Map<number, HTMLSpanElement>>(new Map()); // Character Analysis clusters
+  const inputClusterRefs = useRef<Map<number, HTMLSpanElement>>(new Map()); // Khmer Text panel clusters
+  const [lastClickSource, setLastClickSource] = useState<'input' | 'analysis' | null>(null);
 
   const clusters = useMemo(() => parseKhmerText(inputText), [inputText]);
-  
+
   // Get non-space cluster indices for consistent coloring
   const nonSpaceClusterIndices = useMemo(() => {
     const indices: number[] = [];
@@ -63,61 +78,74 @@ export function AnalyzePage() {
     });
     return indices;
   }, [clusters]);
-  
+
   // Get non-space index for a cluster
   const getNonSpaceIdx = useCallback((clusterIdx: number) => {
     return nonSpaceClusterIndices.indexOf(clusterIdx);
   }, [nonSpaceClusterIndices]);
-  
+
   // Active highlight state (locked takes precedence)
   const activeClusterIdx = lockedClusterIdx ?? hoveredClusterIdx;
   const activeCompIdx = lockedCompIdx ?? hoveredCompIdx;
-  
-  // Scroll to highlighted cluster
+
+  // Scroll to corresponding cluster in the OTHER panel when clicked
   useEffect(() => {
-    if (activeClusterIdx !== null) {
-      const element = clusterRefs.current.get(activeClusterIdx);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    if (lockedClusterIdx !== null && lastClickSource !== null) {
+      // Scroll to the opposite panel from where the click originated
+      if (lastClickSource === 'input') {
+        // Clicked in Khmer text panel -> scroll Character Analysis
+        const element = clusterRefs.current.get(lockedClusterIdx);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      } else if (lastClickSource === 'analysis') {
+        // Clicked in Character Analysis -> scroll Khmer text panel
+        const element = inputClusterRefs.current.get(lockedClusterIdx);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
       }
     }
-  }, [activeClusterIdx]);
-  
+  }, [lockedClusterIdx, lastClickSource]);
+
   // Clear locked highlight when clicking outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       const target = e.target as HTMLElement;
-      if (!target.closest('.input-cluster') && 
-          !target.closest('.cluster-wrapper') && 
-          !target.closest('.romanization-cluster') &&
-          !target.closest('.syllable')) {
+      if (!target.closest('.input-cluster') &&
+        !target.closest('.cluster-wrapper') &&
+        !target.closest('.romanization-cluster') &&
+        !target.closest('.syllable')) {
         setLockedClusterIdx(null);
         setLockedCompIdx(null);
+        setLastClickSource(null);
       }
     }
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
-  
+
   // Highlight handlers
   const handleClusterHover = useCallback((clusterIdx: number | null, compIdx: number | null = null) => {
     setHoveredClusterIdx(clusterIdx);
     setHoveredCompIdx(compIdx);
   }, []);
-  
-  const handleClusterClick = useCallback((clusterIdx: number, compIdx: number | null = null) => {
+
+  const handleClusterClick = useCallback((clusterIdx: number, compIdx: number | null = null, source: 'input' | 'analysis' = 'input') => {
     if (lockedClusterIdx === clusterIdx && lockedCompIdx === compIdx) {
       setLockedClusterIdx(null);
       setLockedCompIdx(null);
+      setLastClickSource(null);
     } else {
       setLockedClusterIdx(clusterIdx);
       setLockedCompIdx(compIdx);
+      setLastClickSource(source);
     }
   }, [lockedClusterIdx, lockedCompIdx]);
 
-  // Split into words (by spaces)
+  // Split into words (by spaces) and track if from new data (no English)
   const words = useMemo(() => {
-    const result: { word: string; clusters: KhmerCluster[]; startIdx: number }[] = [];
+    const result: { word: string; clusters: KhmerCluster[]; startIdx: number; hasEnglish: boolean }[] = [];
     let currentWord = '';
     let currentClusters: KhmerCluster[] = [];
     let startIdx = 0;
@@ -126,7 +154,9 @@ export function AnalyzePage() {
     for (const cluster of clusters) {
       if (cluster.type === 'space') {
         if (currentWord) {
-          result.push({ word: currentWord, clusters: currentClusters, startIdx });
+          const dictEntry = lookupKhmer(currentWord);
+          const hasEnglish = !!dictEntry?.english;
+          result.push({ word: currentWord, clusters: currentClusters, startIdx, hasEnglish });
           currentWord = '';
           currentClusters = [];
         }
@@ -142,7 +172,9 @@ export function AnalyzePage() {
     }
 
     if (currentWord) {
-      result.push({ word: currentWord, clusters: currentClusters, startIdx });
+      const dictEntry = lookupKhmer(currentWord);
+      const hasEnglish = !!dictEntry?.english;
+      result.push({ word: currentWord, clusters: currentClusters, startIdx, hasEnglish });
     }
 
     return result;
@@ -150,6 +182,53 @@ export function AnalyzePage() {
 
   const khmerFontStyle = { fontFamily: `'${settings.selectedFont.family}', 'Noto Sans Khmer', sans-serif` };
   const showIPA = settings.pronunciationMode === 'ipa';
+
+  // Helper to get color scheme:
+  // - Base data (with English translations): cycles through normal color palette
+  // - Seanghay data (Khmer-only, no English): orange highlighting
+  const getClusterColor = useCallback((clusterIdx: number, nonSpaceIdx: number): SyllableColor => {
+    // Check if this cluster belongs to a word without English translation
+    const wordInfo = words.find(w => {
+      return w.startIdx <= clusterIdx && clusterIdx < w.startIdx + w.clusters.length;
+    });
+
+    // If word is in dictionary but has no English, it's from Seanghay dataset - use orange
+    if (wordInfo) {
+      const dictEntry = lookupKhmer(wordInfo.word);
+      if (dictEntry && !dictEntry.english) {
+        return seanghayDataColor;
+      }
+    }
+
+    // Normal color cycling for base/curated data
+    return getSyllableColor(nonSpaceIdx);
+  }, [words]);
+
+  // Helper to get component background color with new data awareness
+  const getClusterComponentBgColor = useCallback((
+    clusterIdx: number,
+    nonSpaceIdx: number,
+    componentType: 'consonant' | 'subscript' | 'vowel' | 'indep_vowel' | 'sign' | 'numeral' | 'punctuation' | 'coeng' | 'space' | 'other'
+  ): string => {
+    const color = getClusterColor(clusterIdx, nonSpaceIdx);
+
+    switch (componentType) {
+      case 'consonant':
+      case 'indep_vowel':
+        return color.bgDark;
+      case 'subscript':
+      case 'coeng':
+        return color.bgMedium;
+      case 'vowel':
+      case 'sign':
+      case 'numeral':
+        return color.bgLight;
+      case 'space':
+        return 'transparent';
+      default:
+        return color.bgMedium;
+    }
+  }, [getClusterColor]);
 
   const getClusterInfo = useCallback((cluster: KhmerCluster) => {
     // Check dictionary first
@@ -192,30 +271,30 @@ export function AnalyzePage() {
           </label>
           <div className="input-mode-toggle">
             {isEditMode ? (
-              <button 
+              <button
                 className="mode-toggle-btn confirm-btn"
-                onClick={() => setIsEditMode(false)}
-                title="Confirm and view (press to lock text)"
+                onClick={handleConfirmText}
+                title="Confirm and auto-segment text"
                 disabled={!inputText.trim()}
               >
                 <svg viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
-                  <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/>
+                  <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
                 </svg>
               </button>
             ) : (
-              <button 
+              <button
                 className="mode-toggle-btn edit-btn"
                 onClick={() => setIsEditMode(true)}
                 title="Edit text"
               >
                 <svg viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
-                  <path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm.176 4.823L9.75 4.81l-6.286 6.287a.253.253 0 0 0-.064.108l-.558 1.953 1.953-.558a.253.253 0 0 0 .108-.064Zm1.238-3.763a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354Z"/>
+                  <path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm.176 4.823L9.75 4.81l-6.286 6.287a.253.253 0 0 0-.064.108l-.558 1.953 1.953-.558a.253.253 0 0 0 .108-.064Zm1.238-3.763a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354Z" />
                 </svg>
               </button>
             )}
           </div>
         </div>
-        
+
         {isEditMode ? (
           <textarea
             id="khmer-input"
@@ -227,7 +306,7 @@ export function AnalyzePage() {
             rows={3}
           />
         ) : (
-          <div 
+          <div
             className="khmer-display interactive"
             style={khmerFontStyle}
           >
@@ -237,16 +316,20 @@ export function AnalyzePage() {
                 if (cluster.type === 'space') {
                   return <span key={clusterIdx} className="input-space"> </span>;
                 }
-                
+
                 const nonSpaceIdx = getNonSpaceIdx(clusterIdx);
                 const syllableColor = getSyllableColor(nonSpaceIdx);
                 const isHighlighted = activeClusterIdx === clusterIdx;
-                
+
                 return (
-                  <span 
-                    key={clusterIdx} 
+                  <span
+                    key={clusterIdx}
+                    ref={(el) => {
+                      if (el) inputClusterRefs.current.set(clusterIdx, el);
+                      else inputClusterRefs.current.delete(clusterIdx);
+                    }}
                     className={`input-cluster ${isHighlighted ? 'highlighted' : ''}`}
-                    style={{ 
+                    style={{
                       '--syllable-accent': syllableColor.accent,
                       '--syllable-bg': syllableColor.bgMedium,
                     } as React.CSSProperties}
@@ -254,7 +337,7 @@ export function AnalyzePage() {
                     onMouseLeave={() => handleClusterHover(null)}
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleClusterClick(clusterIdx);
+                      handleClusterClick(clusterIdx, null, 'input');
                     }}
                   >
                     {cluster.text}
@@ -264,13 +347,13 @@ export function AnalyzePage() {
             ) : (
               <span className="placeholder">Click to add text...</span>
             )}
-            <button 
+            <button
               className="edit-overlay-btn"
               onClick={() => setIsEditMode(true)}
               title="Edit text"
             >
               <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                <path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Z"/>
+                <path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Z" />
               </svg>
             </button>
           </div>
@@ -279,7 +362,7 @@ export function AnalyzePage() {
 
       {/* Space Editor - for manual word boundary editing (always visible, grayed when editing) */}
       {inputText && (
-        <SpaceEditor 
+        <SpaceEditor
           text={inputText}
           onTextChange={setInputText}
           disabled={isEditMode}
@@ -287,7 +370,7 @@ export function AnalyzePage() {
       )}
 
       {/* Romanization Panel (if enabled) */}
-      <RomanizationPanel 
+      <RomanizationPanel
         text={inputText}
         clusters={clusters}
         activeClusterIdx={activeClusterIdx}
@@ -315,10 +398,10 @@ export function AnalyzePage() {
                 }
 
                 const nonSpaceIdx = getNonSpaceIdx(clusterIdx);
-                const syllableColor = getSyllableColor(nonSpaceIdx);
+                const syllableColor = getClusterColor(clusterIdx, nonSpaceIdx);
                 const isClusterHighlighted = activeClusterIdx === clusterIdx;
                 const syllableInfo = getClusterInfo(cluster);
-                
+
                 // Find the word this cluster belongs to
                 const wordInfo = words.find(w => {
                   const clusterInWord = w.startIdx <= clusterIdx && clusterIdx < w.startIdx + w.clusters.length;
@@ -327,7 +410,7 @@ export function AnalyzePage() {
                 const wordLookup = wordInfo ? lookupKhmer(wordInfo.word) : null;
 
                 return (
-                  <span 
+                  <span
                     key={clusterIdx}
                     ref={(el) => {
                       if (el) clusterRefs.current.set(clusterIdx, el);
@@ -340,14 +423,14 @@ export function AnalyzePage() {
                     onClick={(e) => {
                       if (!(e.target as HTMLElement).closest('.char-component')) {
                         e.stopPropagation();
-                        handleClusterClick(clusterIdx);
+                        handleClusterClick(clusterIdx, null, 'analysis');
                       }
                     }}
                   >
                     {cluster.components.map((comp, compIdx) => {
                       const isCompHighlighted = isClusterHighlighted && activeCompIdx === compIdx;
                       const compInfo = getComponentInfo(comp.char, comp.type);
-                      const compBg = getComponentBgColor(nonSpaceIdx, comp.type);
+                      const compBg = getClusterComponentBgColor(clusterIdx, nonSpaceIdx, comp.type);
 
                       return (
                         <span
@@ -363,7 +446,7 @@ export function AnalyzePage() {
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleClusterClick(clusterIdx, compIdx);
+                            handleClusterClick(clusterIdx, compIdx, 'analysis');
                           }}
                         >
                           {comp.char}
@@ -383,7 +466,7 @@ export function AnalyzePage() {
                                   <ConfidenceWarning level={syllableInfo.confidence} warnings={syllableInfo.warnings} inline />
                                 )}
                               </div>
-                              
+
                               {/* Two Column Layout */}
                               <div className="tooltip-columns">
                                 {/* Word Column */}
@@ -401,9 +484,15 @@ export function AnalyzePage() {
                                       <div className="column-row">
                                         <span className="column-value phonetic">{wordLookup.phonetic}</span>
                                       </div>
-                                      <div className="column-row">
-                                        <span className="column-value english">{wordLookup.english}</span>
-                                      </div>
+                                      {wordLookup.english ? (
+                                        <div className="column-row">
+                                          <span className="column-value english">{wordLookup.english}</span>
+                                        </div>
+                                      ) : (
+                                        <div className="column-row">
+                                          <span className="column-value seanghay-note">Seanghay data</span>
+                                        </div>
+                                      )}
                                       {wordLookup.pos && (
                                         <span className="column-pos">{POS_LABELS[wordLookup.pos] || wordLookup.pos}</span>
                                       )}
@@ -414,7 +503,7 @@ export function AnalyzePage() {
                                     </div>
                                   )}
                                 </div>
-                                
+
                                 {/* Component Column */}
                                 <div className="tooltip-column component-column">
                                   <div className="column-header">
@@ -442,11 +531,11 @@ export function AnalyzePage() {
                                   )}
                                 </div>
                               </div>
-                              
+
                               {/* Component breakdown */}
                               <div className="tooltip-components">
                                 {cluster.components.map((c, i) => {
-                                  const cBg = getComponentBgColor(nonSpaceIdx, c.type);
+                                  const cBg = getClusterComponentBgColor(clusterIdx, nonSpaceIdx, c.type);
                                   return (
                                     <span
                                       key={i}
@@ -484,7 +573,7 @@ export function AnalyzePage() {
                         )}
                         <div className="tooltip-components">
                           {cluster.components.map((c, i) => {
-                            const cBg = getComponentBgColor(nonSpaceIdx, c.type);
+                            const cBg = getClusterComponentBgColor(clusterIdx, nonSpaceIdx, c.type);
                             return (
                               <span key={i} className="mini-component" style={{ backgroundColor: cBg }}>
                                 {c.char}
@@ -515,6 +604,11 @@ export function AnalyzePage() {
                 <span className="legend-color light" />
                 <span className="legend-label">Vowel/sign</span>
               </div>
+              <div className="legend-item legend-separator" />
+              <div className="legend-item">
+                <span className="legend-color seanghay" />
+                <span className="legend-label">Seanghay data (Khmer-only)</span>
+              </div>
               <span className="legend-note">Each syllable gets a unique color</span>
             </div>
           </section>
@@ -529,8 +623,8 @@ export function AnalyzePage() {
                   if (!entry) return null;
 
                   // Get romanization based on mode
-                  const displayRomanization = showIPA 
-                    ? (entry.romanized || entry.phonetic?.toLowerCase() || '') 
+                  const displayRomanization = showIPA
+                    ? (entry.romanized || entry.phonetic?.toLowerCase() || '')
                     : (entry.phonetic || '');
 
                   return (
