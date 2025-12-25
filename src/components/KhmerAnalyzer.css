@@ -1,0 +1,409 @@
+/* Swiss Design inspired Khmer Analyzer styles */
+
+.khmer-analyzer {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Input Section */
+.input-section {
+  margin-bottom: 3rem;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.khmer-input {
+  width: 100%;
+  padding: 1.25rem 1.5rem;
+  font-family: 'Noto Sans Khmer', 'Khmer OS', sans-serif;
+  font-size: 1.5rem;
+  line-height: 2;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  resize: vertical;
+  transition: all 0.2s ease;
+}
+
+.khmer-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.khmer-input::placeholder {
+  color: var(--color-tertiary);
+}
+
+/* Analysis Sections */
+.analysis-section {
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: var(--color-surface);
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+}
+
+.section-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-secondary);
+  margin: 0 0 0.5rem 0;
+}
+
+.section-subtitle {
+  font-size: 0.875rem;
+  color: var(--color-tertiary);
+  margin: 0 0 1.5rem 0;
+}
+
+/* Rainbow Text Display */
+.rainbow-text {
+  font-family: 'Noto Sans Khmer', 'Khmer OS', sans-serif;
+  font-size: 2.5rem;
+  line-height: 2.5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.125rem;
+}
+
+.cluster-wrapper {
+  display: inline-flex;
+  align-items: baseline;
+  position: relative;
+}
+
+.cluster-divider {
+  width: 2px;
+  height: 1em;
+  background: var(--color-border);
+  margin: 0 0.25rem;
+  opacity: 0.3;
+}
+
+.char-component {
+  position: relative;
+  padding: 0.125rem 0.25rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.char-component:hover,
+.char-component.hovered {
+  transform: scale(1.1);
+  z-index: 10;
+}
+
+.space-char {
+  width: 1.5rem;
+  display: inline-block;
+}
+
+/* Component Tooltip */
+.component-tooltip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-text);
+  color: var(--color-bg);
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  animation: tooltipFadeIn 0.15s ease;
+}
+
+.component-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--color-text);
+}
+
+.tooltip-char {
+  font-family: 'Noto Sans Khmer', 'Khmer OS', sans-serif;
+  font-size: 1.5rem;
+}
+
+.tooltip-type {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.tooltip-ipa {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: var(--color-accent-light);
+}
+
+.tooltip-name {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+/* Legend */
+.legend-section {
+  margin-bottom: 2rem;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 2px solid;
+}
+
+.legend-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-secondary);
+}
+
+/* Word Row */
+.word-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.word-group {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: var(--color-bg);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+}
+
+.syllable {
+  position: relative;
+  font-family: 'Noto Sans Khmer', 'Khmer OS', sans-serif;
+  font-size: 2rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 3px solid transparent;
+}
+
+.syllable:hover,
+.syllable.hovered {
+  background: var(--color-surface);
+  border-bottom-color: var(--accent-color, var(--color-accent));
+  transform: translateY(-2px);
+}
+
+.syllable-text {
+  position: relative;
+  z-index: 1;
+}
+
+/* Syllable Tooltip */
+.syllable-tooltip {
+  position: absolute;
+  bottom: calc(100% + 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-text);
+  color: var(--color-bg);
+  border-radius: 12px;
+  min-width: 200px;
+  overflow: hidden;
+  z-index: 100;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  animation: tooltipFadeIn 0.2s ease;
+}
+
+.syllable-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: var(--color-text);
+}
+
+.tooltip-header {
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tooltip-khmer {
+  font-family: 'Noto Sans Khmer', 'Khmer OS', sans-serif;
+  font-size: 1.75rem;
+}
+
+.tooltip-body {
+  padding: 1rem 1.25rem;
+}
+
+.tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.375rem 0;
+}
+
+.tooltip-row:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tooltip-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.tooltip-value {
+  font-size: 0.875rem;
+}
+
+.tooltip-value.ipa {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: #64D2FF;
+}
+
+.tooltip-value.english {
+  font-weight: 500;
+  color: #30D158;
+}
+
+.tooltip-components {
+  padding: 0.75rem 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.mini-component {
+  font-family: 'Noto Sans Khmer', 'Khmer OS', sans-serif;
+  font-size: 1rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+/* Dictionary Matches */
+.dictionary-matches {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dict-entry {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--color-bg);
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+}
+
+.dict-khmer {
+  font-family: 'Noto Sans Khmer', 'Khmer OS', sans-serif;
+  font-size: 1.5rem;
+  min-width: 120px;
+}
+
+.dict-arrow {
+  color: var(--color-tertiary);
+}
+
+.dict-ipa {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.875rem;
+  color: var(--color-accent);
+  min-width: 100px;
+}
+
+.dict-english {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+/* Animations */
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .rainbow-text {
+    font-size: 1.75rem;
+  }
+
+  .syllable {
+    font-size: 1.5rem;
+  }
+
+  .word-row {
+    gap: 1rem;
+  }
+
+  .word-group {
+    padding: 0.75rem 1rem;
+  }
+
+  .syllable-tooltip {
+    min-width: 160px;
+  }
+
+  .legend {
+    gap: 0.5rem;
+  }
+}
+
