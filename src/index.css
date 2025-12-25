@@ -16,6 +16,13 @@
   --font-mono: "SF Mono", "Fira Code", "Consolas", monospace;
   --font-khmer: "Noto Sans Khmer", "Khmer OS", sans-serif;
 
+  /* Khmer Text Sizing - Standardized across panels */
+  --khmer-size-lg: 1.75rem;      /* Primary input/display */
+  --khmer-size-md: 1.5rem;       /* Secondary displays */
+  --khmer-size-sm: 1.25rem;      /* Smaller text (romanization) */
+  --khmer-line-height: 2;        /* Standard line height for Khmer */
+  --khmer-line-height-tight: 1.6; /* Tighter spacing */
+
   /* Colors - Light Theme */
   --color-bg: #fafafa;
   --color-surface: #ffffff;
@@ -33,6 +40,10 @@
   --space-lg: 1.5rem;
   --space-xl: 2rem;
   --space-2xl: 3rem;
+
+  /* Panel Styling - Standardized */
+  --panel-padding: 1.25rem;
+  --panel-radius: 12px;
 
   /* Radii */
   --radius-sm: 6px;

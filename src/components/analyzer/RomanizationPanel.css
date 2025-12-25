@@ -1,43 +1,16 @@
 /* Romanization Panel - Shows romanized text in a separate display */
 .romanization-panel {
-  margin-top: 1rem;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: var(--panel-radius);
   overflow: hidden;
 }
 
-.panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.625rem 1rem;
-  background: var(--color-bg);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.panel-title {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-secondary);
-}
-
-.panel-mode {
-  font-size: 0.625rem;
-  font-weight: 500;
-  padding: 0.125rem 0.5rem;
-  background: rgba(0, 122, 255, 0.1);
-  color: var(--color-accent);
-  border-radius: 4px;
-}
-
-.panel-content {
-  padding: 1rem 1.25rem;
+.romanization-panel .panel-content {
+  padding: var(--panel-padding);
   font-family: var(--font-mono);
-  font-size: 1.125rem;
-  line-height: 2;
+  font-size: var(--khmer-size-sm);
+  line-height: var(--khmer-line-height);
   color: var(--color-text);
 }
 
@@ -61,7 +34,8 @@
 }
 
 @keyframes romPulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 2px var(--syllable-accent, var(--color-accent));
   }
   50% {
@@ -87,7 +61,7 @@
 }
 
 .rom-item:not(:last-child)::after {
-  content: '-';
+  content: "-";
   color: var(--color-border);
   margin: 0 0.125rem;
 }
@@ -96,4 +70,3 @@
 .rom-space + .rom-item::before {
   content: none;
 }
-

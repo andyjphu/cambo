@@ -3,11 +3,12 @@ import { useSettings } from '../context/SettingsContext';
 import { parseKhmerText, type KhmerCluster, type KhmerCharType } from '../utils/khmerParser';
 import { romanizeCluster, getCharRomanization } from '../utils/alaLcRomanization';
 import { lookupKhmer } from '../utils/dictionaryCore';
-import { segmentText, segmentedToText } from '../utils/wordSegmentation';
-import { getSyllableColor, seanghayDataColor, type SyllableColor } from '../utils/colors';
+import { segmentText, segmentedToText, refreshDictionary } from '../utils/wordSegmentation';
+import { getSyllableColor, getComponentBgColor, type SyllableColor } from '../utils/colors';
 import { RomanizationPanel } from '../components/analyzer/RomanizationPanel';
 import { ConfidenceWarning } from '../components/analyzer/ConfidenceWarning';
 import { SpaceEditor } from '../components/analyzer/SpaceEditor';
+import { SelectionPanel } from '../components/analyzer/SelectionPanel';
 import './AnalyzePage.css';
 
 const TYPE_LABELS: Record<KhmerCharType, string> = {
@@ -36,10 +37,68 @@ const POS_LABELS: Record<string, string> = {
   num: 'number',
 };
 
+const INPUT_TEXT_STORAGE_KEY = 'cambo-input-text';
+const PANEL_STATE_STORAGE_KEY = 'cambo-panel-states';
+const DEFAULT_INPUT_TEXT = 'សួស្តី ខ្ញុំ ស្រឡាញ់ កម្ពុជា';
+
+interface PanelStates {
+  wordBoundaries: boolean;
+  romanization: boolean;
+}
+
+const DEFAULT_PANEL_STATES: PanelStates = {
+  wordBoundaries: true,
+  romanization: true,
+};
+
+function loadInputText(): string {
+  try {
+    const saved = localStorage.getItem(INPUT_TEXT_STORAGE_KEY);
+    return saved ?? DEFAULT_INPUT_TEXT;
+  } catch {
+    return DEFAULT_INPUT_TEXT;
+  }
+}
+
+function loadPanelStates(): PanelStates {
+  try {
+    const saved = localStorage.getItem(PANEL_STATE_STORAGE_KEY);
+    if (saved) {
+      return { ...DEFAULT_PANEL_STATES, ...JSON.parse(saved) };
+    }
+    return DEFAULT_PANEL_STATES;
+  } catch {
+    return DEFAULT_PANEL_STATES;
+  }
+}
+
 export function AnalyzePage() {
   const { settings } = useSettings();
-  const [inputText, setInputText] = useState('សួស្តី ខ្ញុំ ស្រឡាញ់ កម្ពុជា');
+  const [inputText, setInputText] = useState(loadInputText);
   const [isEditMode, setIsEditMode] = useState(true);
+  const [panelStates, setPanelStates] = useState<PanelStates>(loadPanelStates);
+
+  // Persist input text to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(INPUT_TEXT_STORAGE_KEY, inputText);
+    } catch (e) {
+      console.warn('Failed to save input text:', e);
+    }
+  }, [inputText]);
+
+  // Persist panel states to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(PANEL_STATE_STORAGE_KEY, JSON.stringify(panelStates));
+    } catch (e) {
+      console.warn('Failed to save panel states:', e);
+    }
+  }, [panelStates]);
+
+  const togglePanel = useCallback((panel: keyof PanelStates) => {
+    setPanelStates(prev => ({ ...prev, [panel]: !prev[panel] }));
+  }, []);
 
   // Handler to confirm text and apply automatic segmentation
   const handleConfirmText = useCallback(() => {
@@ -66,7 +125,56 @@ export function AnalyzePage() {
   const inputClusterRefs = useRef<Map<number, HTMLSpanElement>>(new Map()); // Khmer Text panel clusters
   const [lastClickSource, setLastClickSource] = useState<'input' | 'analysis' | null>(null);
 
+  // Selection mode for multi-select and dictionary operations
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedClusterIndices, setSelectedClusterIndices] = useState<Set<number>>(new Set());
+  const [showSelectionPanel, setShowSelectionPanel] = useState(false);
+
   const clusters = useMemo(() => parseKhmerText(inputText), [inputText]);
+
+  // Compute selected text from selected clusters
+  const selectedText = useMemo(() => {
+    if (selectedClusterIndices.size === 0) return '';
+
+    // Get sorted indices and build text
+    const sortedIndices = Array.from(selectedClusterIndices).sort((a, b) => a - b);
+    return sortedIndices.map(idx => clusters[idx]?.text || '').join('');
+  }, [selectedClusterIndices, clusters]);
+
+  // Toggle selection mode
+  const toggleSelectionMode = useCallback(() => {
+    setIsSelectionMode(prev => {
+      if (prev) {
+        // Exiting selection mode - clear selections
+        setSelectedClusterIndices(new Set());
+        setShowSelectionPanel(false);
+      }
+      return !prev;
+    });
+  }, []);
+
+  // Handle cluster selection in selection mode
+  const handleClusterSelect = useCallback((clusterIdx: number) => {
+    setSelectedClusterIndices(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(clusterIdx)) {
+        newSet.delete(clusterIdx);
+      } else {
+        newSet.add(clusterIdx);
+      }
+      // Show panel if we have selections
+      if (newSet.size > 0 && !showSelectionPanel) {
+        setShowSelectionPanel(true);
+      }
+      return newSet;
+    });
+  }, [showSelectionPanel]);
+
+  // Handle word added callback
+  const handleWordAdded = useCallback(() => {
+    // Refresh dictionary after adding a word
+    refreshDictionary();
+  }, []);
 
   // Get non-space cluster indices for consistent coloring
   const nonSpaceClusterIndices = useMemo(() => {
@@ -93,16 +201,16 @@ export function AnalyzePage() {
     if (lockedClusterIdx !== null && lastClickSource !== null) {
       // Scroll to the opposite panel from where the click originated
       if (lastClickSource === 'input') {
-        // Clicked in Khmer text panel -> scroll Character Analysis
+        // Clicked in Khmer text panel (or Romanization) -> scroll to Character Analysis
         const element = clusterRefs.current.get(lockedClusterIdx);
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
         }
       } else if (lastClickSource === 'analysis') {
-        // Clicked in Character Analysis -> scroll Khmer text panel
+        // Clicked in Character Analysis -> scroll to Khmer text panel (at top)
         const element = inputClusterRefs.current.get(lockedClusterIdx);
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
         }
       }
     }
@@ -183,52 +291,19 @@ export function AnalyzePage() {
   const khmerFontStyle = { fontFamily: `'${settings.selectedFont.family}', 'Noto Sans Khmer', sans-serif` };
   const showIPA = settings.pronunciationMode === 'ipa';
 
-  // Helper to get color scheme:
-  // - Base data (with English translations): cycles through normal color palette
-  // - Seanghay data (Khmer-only, no English): orange highlighting
-  const getClusterColor = useCallback((clusterIdx: number, nonSpaceIdx: number): SyllableColor => {
-    // Check if this cluster belongs to a word without English translation
-    const wordInfo = words.find(w => {
-      return w.startIdx <= clusterIdx && clusterIdx < w.startIdx + w.clusters.length;
-    });
-
-    // If word is in dictionary but has no English, it's from Seanghay dataset - use orange
-    if (wordInfo) {
-      const dictEntry = lookupKhmer(wordInfo.word);
-      if (dictEntry && !dictEntry.english) {
-        return seanghayDataColor;
-      }
-    }
-
-    // Normal color cycling for base/curated data
+  // Helper to get color scheme - cycles through color palette
+  const getClusterColor = useCallback((_clusterIdx: number, nonSpaceIdx: number): SyllableColor => {
     return getSyllableColor(nonSpaceIdx);
-  }, [words]);
+  }, []);
 
-  // Helper to get component background color with new data awareness
+  // Helper to get component background color
   const getClusterComponentBgColor = useCallback((
-    clusterIdx: number,
+    _clusterIdx: number,
     nonSpaceIdx: number,
     componentType: 'consonant' | 'subscript' | 'vowel' | 'indep_vowel' | 'sign' | 'numeral' | 'punctuation' | 'coeng' | 'space' | 'other'
   ): string => {
-    const color = getClusterColor(clusterIdx, nonSpaceIdx);
-
-    switch (componentType) {
-      case 'consonant':
-      case 'indep_vowel':
-        return color.bgDark;
-      case 'subscript':
-      case 'coeng':
-        return color.bgMedium;
-      case 'vowel':
-      case 'sign':
-      case 'numeral':
-        return color.bgLight;
-      case 'space':
-        return 'transparent';
-      default:
-        return color.bgMedium;
-    }
-  }, [getClusterColor]);
+    return getComponentBgColor(nonSpaceIdx, componentType);
+  }, []);
 
   const getClusterInfo = useCallback((cluster: KhmerCluster) => {
     // Check dictionary first
@@ -318,7 +393,9 @@ export function AnalyzePage() {
                 }
 
                 const nonSpaceIdx = getNonSpaceIdx(clusterIdx);
-                const syllableColor = getSyllableColor(nonSpaceIdx);
+                // Use same color source as Character Analysis for visual consistency
+                // Matching between panels is done via clusterIdx, not colors
+                const syllableColor = getClusterColor(clusterIdx, nonSpaceIdx);
                 const isHighlighted = activeClusterIdx === clusterIdx;
 
                 return (
@@ -360,33 +437,99 @@ export function AnalyzePage() {
         )}
       </div>
 
-      {/* Space Editor - for manual word boundary editing (always visible, grayed when editing) */}
+      {/* Space Editor - for manual word boundary editing (collapsible) */}
       {inputText && (
-        <SpaceEditor
-          text={inputText}
-          onTextChange={setInputText}
-          disabled={isEditMode}
-        />
+        <section className={`collapsible-panel ${panelStates.wordBoundaries ? 'expanded' : 'collapsed'}`}>
+          <button
+            className="panel-header-btn"
+            onClick={() => togglePanel('wordBoundaries')}
+            aria-expanded={panelStates.wordBoundaries}
+          >
+            <span className="panel-title">Word Boundaries</span>
+            <svg
+              className={`collapse-icon ${panelStates.wordBoundaries ? 'expanded' : ''}`}
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              width="14"
+              height="14"
+            >
+              <path fillRule="evenodd" d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" />
+            </svg>
+          </button>
+          {panelStates.wordBoundaries && (
+            <div className="panel-content-wrapper">
+              <SpaceEditor
+                text={inputText}
+                onTextChange={setInputText}
+                disabled={isEditMode}
+              />
+            </div>
+          )}
+        </section>
       )}
 
-      {/* Romanization Panel (if enabled) */}
-      <RomanizationPanel
-        text={inputText}
-        clusters={clusters}
-        activeClusterIdx={activeClusterIdx}
-        onClusterHover={handleClusterHover}
-        onClusterClick={handleClusterClick}
-        getNonSpaceIdx={getNonSpaceIdx}
-      />
+      {/* Romanization Panel (collapsible) */}
+      <section className={`collapsible-panel ${panelStates.romanization ? 'expanded' : 'collapsed'}`}>
+        <button
+          className="panel-header-btn"
+          onClick={() => togglePanel('romanization')}
+          aria-expanded={panelStates.romanization}
+        >
+          <div className="panel-title-group">
+            <span className="panel-title">Romanization</span>
+            <span className="panel-mode-badge">{settings.pronunciationMode === 'ipa' ? 'ALA-LC' : 'Phonetic'}</span>
+          </div>
+          <svg
+            className={`collapse-icon ${panelStates.romanization ? 'expanded' : ''}`}
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            width="14"
+            height="14"
+          >
+            <path fillRule="evenodd" d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" />
+          </svg>
+        </button>
+        {panelStates.romanization && (
+          <div className="panel-content-wrapper">
+            <RomanizationPanel
+              text={inputText}
+              clusters={clusters}
+              activeClusterIdx={activeClusterIdx}
+              onClusterHover={handleClusterHover}
+              onClusterClick={handleClusterClick}
+              getNonSpaceIdx={getNonSpaceIdx}
+            />
+          </div>
+        )}
+      </section>
 
       {inputText && (
         <>
           {/* Character Analysis */}
           <section className="analysis-section">
-            <h2 className="section-title">Character Analysis</h2>
-            <p className="section-subtitle">
-              {!isEditMode ? 'Hover components for syllable, word & character details' : 'Each syllable has a unique color'}
-            </p>
+            <div className="section-header-row">
+              <div>
+                <h2 className="section-title">Character Analysis</h2>
+                <p className="section-subtitle">
+                  {isSelectionMode
+                    ? 'Click syllables to select, then use the panel to copy or add to dictionary'
+                    : !isEditMode
+                      ? 'Hover components for syllable, word & character details'
+                      : 'Each syllable has a unique color'}
+                </p>
+              </div>
+              <button
+                className={`selection-mode-btn ${isSelectionMode ? 'active' : ''}`}
+                onClick={toggleSelectionMode}
+                title={isSelectionMode ? 'Exit selection mode' : 'Enter selection mode'}
+              >
+                <svg viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+                  <path d="M5.75 7.5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Zm5.25.75a.75.75 0 0 0-1.5 0v1.5a.75.75 0 0 0 1.5 0v-1.5Z" />
+                  <path d="M6.25 0a.75.75 0 0 0 0 1.5H7.5v2H3.75A1.75 1.75 0 0 0 2 5.25v.5a.75.75 0 0 0 1.5 0v-.5a.25.25 0 0 1 .25-.25H7.5v3.5H5.75a.75.75 0 0 0 0 1.5H7.5v.5c0 .69.28 1.315.732 1.768l1.5 1.5a.75.75 0 0 0 1.06-1.06l-1.5-1.5A.25.25 0 0 1 9 10.5V10h2.25a.75.75 0 0 0 0-1.5H9V5h3.25a.25.25 0 0 1 .25.25v.5a.75.75 0 0 0 1.5 0v-.5A1.75 1.75 0 0 0 12.25 3.5H9v-2h1.25a.75.75 0 0 0 0-1.5h-4Z" />
+                </svg>
+                {isSelectionMode ? 'Done' : 'Select'}
+              </button>
+            </div>
             <div className="rainbow-text" style={khmerFontStyle} ref={charAnalysisRef}>
               {clusters.map((cluster, clusterIdx) => {
                 if (cluster.type === 'space') {
@@ -409,6 +552,8 @@ export function AnalyzePage() {
                 });
                 const wordLookup = wordInfo ? lookupKhmer(wordInfo.word) : null;
 
+                const isSelected = selectedClusterIndices.has(clusterIdx);
+
                 return (
                   <span
                     key={clusterIdx}
@@ -416,13 +561,15 @@ export function AnalyzePage() {
                       if (el) clusterRefs.current.set(clusterIdx, el);
                       else clusterRefs.current.delete(clusterIdx);
                     }}
-                    className={`cluster-wrapper ${isClusterHighlighted ? 'cluster-highlighted' : ''}`}
+                    className={`cluster-wrapper ${isClusterHighlighted ? 'cluster-highlighted' : ''} ${isSelected ? 'cluster-selected' : ''} ${isSelectionMode ? 'selection-mode' : ''}`}
                     style={{ '--syllable-accent': syllableColor.accent } as React.CSSProperties}
-                    onMouseEnter={() => handleClusterHover(clusterIdx)}
-                    onMouseLeave={() => handleClusterHover(null)}
+                    onMouseEnter={() => !isSelectionMode && handleClusterHover(clusterIdx)}
+                    onMouseLeave={() => !isSelectionMode && handleClusterHover(null)}
                     onClick={(e) => {
-                      if (!(e.target as HTMLElement).closest('.char-component')) {
-                        e.stopPropagation();
+                      e.stopPropagation();
+                      if (isSelectionMode) {
+                        handleClusterSelect(clusterIdx);
+                      } else if (!(e.target as HTMLElement).closest('.char-component')) {
                         handleClusterClick(clusterIdx, null, 'analysis');
                       }
                     }}
@@ -442,11 +589,18 @@ export function AnalyzePage() {
                           } as React.CSSProperties}
                           onMouseEnter={(e) => {
                             e.stopPropagation();
-                            handleClusterHover(clusterIdx, compIdx);
+                            if (!isSelectionMode) {
+                              handleClusterHover(clusterIdx, compIdx);
+                            }
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleClusterClick(clusterIdx, compIdx, 'analysis');
+                            if (isSelectionMode) {
+                              // In selection mode, clicking any part of syllable selects the whole syllable
+                              handleClusterSelect(clusterIdx);
+                            } else {
+                              handleClusterClick(clusterIdx, compIdx, 'analysis');
+                            }
                           }}
                         >
                           {comp.char}
@@ -490,7 +644,7 @@ export function AnalyzePage() {
                                         </div>
                                       ) : (
                                         <div className="column-row">
-                                          <span className="column-value seanghay-note">Seanghay data</span>
+                                          <span className="column-value no-translation">No translation</span>
                                         </div>
                                       )}
                                       {wordLookup.pos && (
@@ -604,11 +758,6 @@ export function AnalyzePage() {
                 <span className="legend-color light" />
                 <span className="legend-label">Vowel/sign</span>
               </div>
-              <div className="legend-item legend-separator" />
-              <div className="legend-item">
-                <span className="legend-color seanghay" />
-                <span className="legend-label">Seanghay data (Khmer-only)</span>
-              </div>
               <span className="legend-note">Each syllable gets a unique color</span>
             </div>
           </section>
@@ -650,6 +799,14 @@ export function AnalyzePage() {
           )}
         </>
       )}
+
+      {/* Selection Panel - left sidebar for selection tools */}
+      <SelectionPanel
+        selectedText={selectedText}
+        isOpen={showSelectionPanel && isSelectionMode}
+        onClose={() => setShowSelectionPanel(false)}
+        onWordAdded={handleWordAdded}
+      />
     </div>
   );
 }

@@ -93,10 +93,6 @@ export function RomanizationPanel({
 
   return (
     <div className="romanization-panel">
-      <div className="panel-header">
-        <span className="panel-title">Romanization</span>
-        <span className="panel-mode">{showIPA ? 'ALA-LC' : 'Phonetic'}</span>
-      </div>
       <div className="panel-content">
         {romanizedData.map((item, idx) => {
           if (item.isSpace) {

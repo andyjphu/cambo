@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import { khmerFonts, type KhmerFont } from '../utils/fonts';
+import { khmerFonts, loadFont, type KhmerFont } from '../utils/fonts';
 
 export type PronunciationMode = 'ipa' | 'phonetic';
 
@@ -68,6 +68,16 @@ const SettingsContext = createContext<SettingsContextType | null>(null);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<Settings>(loadSettings);
+
+  // Load the selected font CSS on mount and when font changes
+  useEffect(() => {
+    const font = settings.selectedFont;
+    if (font && font.googleFont) {
+      loadFont(font).catch(err => {
+        console.warn('Failed to load font on startup:', err);
+      });
+    }
+  }, [settings.selectedFont]);
 
   // Save to localStorage whenever settings change
   useEffect(() => {

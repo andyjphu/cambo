@@ -4,6 +4,7 @@ import { Navbar } from './components/layout/Navbar';
 import { SubNav } from './components/layout/SubNav';
 import { AnalyzePage } from './pages/AnalyzePage';
 import { LookupPage } from './pages/LookupPage';
+import { DictionaryPage } from './pages/DictionaryPage';
 import './App.css';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
             <Routes>
               <Route path="/" element={<AnalyzePage />} />
               <Route path="/lookup" element={<LookupPage />} />
+              <Route path="/dictionary" element={<DictionaryPage />} />
             </Routes>
           </main>
           

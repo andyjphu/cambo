@@ -9,12 +9,12 @@
  * A cluster (consonant + vowels/diacritics) is treated as an indivisible unit.
  * This ensures srak (vowels) are never broken off from their consonants.
  * 
- * Current approach: Uses our existing dictionary (~250 words)
+ * Current approach: Uses core dictionary + user dictionary from localStorage
  * Future: Can plug in an LLM API for better accuracy
  */
 
 import { coreDictionary, lookupKhmer, type DictionaryEntry } from './dictionaryCore';
-import { getExtendedDictionary, getWordListSet, loadWordList, lookupExtended } from './dictionaryLoader';
+import { getUserDictionary, lookupUserWord } from './userDictionary';
 import { parseKhmerText, type KhmerCluster } from './khmerParser';
 
 export interface SegmentedWord {
@@ -40,50 +40,28 @@ let dictionaryMap: Map<string, DictionaryEntry> | null = null;
 function initDictionary() {
   if (dictionaryWords) return;
 
-  // First, try to use the pre-loaded word list (25K+ words)
-  const wordList = getWordListSet();
-  if (wordList && wordList.size > 0) {
-    dictionaryWords = wordList;
-  } else {
-    // Fallback to building from dictionaries
-    dictionaryWords = new Set<string>();
-
-    // Add core dictionary words
-    for (const entry of coreDictionary) {
-      dictionaryWords.add(entry.khmer);
-    }
-
-    // Add extended dictionary if loaded
-    const extended = getExtendedDictionary();
-    if (extended) {
-      for (const entry of extended) {
-        dictionaryWords.add(entry.khmer);
-      }
-    }
-  }
-
-  // Build lookup map from dictionaries
+  dictionaryWords = new Set<string>();
   dictionaryMap = new Map<string, DictionaryEntry>();
+
+  // Add core dictionary words first
   for (const entry of coreDictionary) {
+    dictionaryWords.add(entry.khmer);
     dictionaryMap.set(entry.khmer, entry);
   }
-  const extended = getExtendedDictionary();
-  if (extended) {
-    for (const entry of extended) {
-      if (!dictionaryMap.has(entry.khmer)) {
-        dictionaryMap.set(entry.khmer, entry);
-      }
-    }
+
+  // Add user dictionary words - these OVERRIDE core dictionary entries
+  const userDict = getUserDictionary();
+  for (const entry of userDict) {
+    dictionaryWords.add(entry.khmer);
+    // User dictionary always takes precedence
+    dictionaryMap.set(entry.khmer, entry);
   }
 }
 
 /**
- * Ensure word list is loaded for segmentation
- * Call this early in your app initialization
+ * Reinitialize dictionary (call after adding user words)
  */
-export async function ensureWordListLoaded(): Promise<void> {
-  await loadWordList();
-  // Reinitialize with the loaded word list
+export function refreshDictionary(): void {
   dictionaryWords = null;
   dictionaryMap = null;
   initDictionary();
@@ -91,20 +69,25 @@ export async function ensureWordListLoaded(): Promise<void> {
 
 /**
  * Get dictionary entry for a word
- * Checks core dictionary first, then extended
+ * User dictionary takes precedence over core dictionary
  */
 export function getDictionaryEntry(word: string): DictionaryEntry | null {
-  // Try core dictionary first (always loaded, has English)
+  // User dictionary takes precedence
+  const userEntry = lookupUserWord(word);
+  if (userEntry) return userEntry;
+
+  // Fall back to core dictionary
   const coreEntry = lookupKhmer(word);
   if (coreEntry) return coreEntry;
 
-  // Try extended dictionary
-  const extEntry = lookupExtended(word);
-  if (extEntry) return extEntry;
+  return null;
+}
 
-  // Fallback to map
-  initDictionary();
-  return dictionaryMap?.get(word) || null;
+/**
+ * Check if a word is defined in the user dictionary
+ */
+export function isUserDefinedWord(word: string): boolean {
+  return lookupUserWord(word) !== null;
 }
 
 /**

@@ -137,6 +137,48 @@ export function parseKhmerText(text: string): KhmerCluster[] {
             continue;
         }
 
+        // Handle consecutive numerals as a single cluster (e.g., ១២៣ = 123)
+        if (type === 'numeral') {
+            let numeralText = '';
+            const numeralComponents: KhmerComponent[] = [];
+            while (i < text.length && classifyChar(text[i]) === 'numeral') {
+                numeralComponents.push({
+                    char: text[i],
+                    type: 'numeral',
+                    codepoint: text[i].charCodeAt(0)
+                });
+                numeralText += text[i];
+                i++;
+            }
+            clusters.push({
+                text: numeralText,
+                type: 'numeral',
+                components: numeralComponents
+            });
+            continue;
+        }
+
+        // Handle consecutive punctuation as a single cluster
+        if (type === 'punctuation') {
+            let punctText = '';
+            const punctComponents: KhmerComponent[] = [];
+            while (i < text.length && classifyChar(text[i]) === 'punctuation') {
+                punctComponents.push({
+                    char: text[i],
+                    type: 'punctuation',
+                    codepoint: text[i].charCodeAt(0)
+                });
+                punctText += text[i];
+                i++;
+            }
+            clusters.push({
+                text: punctText,
+                type: 'punctuation',
+                components: punctComponents
+            });
+            continue;
+        }
+
         // Start building a cluster
         const components: KhmerComponent[] = [];
         let clusterText = '';
