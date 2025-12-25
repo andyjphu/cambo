@@ -154,7 +154,7 @@ export function AnalyzePage() {
                           onMouseLeave={() => setHoveredComponent(null)}
                         >
                           {comp.char}
-                          {isHovered && compInfo && settings.romanizationDisplay === 'hover' && (
+                          {isHovered && compInfo && settings.showHoverTooltips && (
                             <span className="component-tooltip">
                               <span className="tooltip-char" style={khmerFontStyle}>{comp.char}</span>
                               <span className="tooltip-type">{TYPE_LABELS[comp.type]}</span>
@@ -197,7 +197,7 @@ export function AnalyzePage() {
           <section className="analysis-section">
             <h2 className="section-title">Word Analysis</h2>
             <p className="section-subtitle">
-              {settings.romanizationDisplay === 'hover' 
+              {settings.showHoverTooltips 
                 ? 'Hover over syllables for pronunciation and meaning'
                 : 'Tap syllables for details'
               }
@@ -229,7 +229,7 @@ export function AnalyzePage() {
                             warnings={info.warnings}
                           />
                         )}
-                        {isHovered && settings.romanizationDisplay === 'hover' && (
+                        {isHovered && settings.showHoverTooltips && (
                           <div className="syllable-tooltip">
                             <div className="tooltip-header">
                               <span className="tooltip-khmer" style={khmerFontStyle}>

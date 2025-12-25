@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useSettings } from '../../context/SettingsContext';
-import { khmerFonts, getFontsByStyle, styleLabels, loadFont, isFontLoaded, type KhmerFont } from '../../utils/fonts';
+import { getFontsByStyle, styleLabels, loadFont, isFontLoaded, type KhmerFont } from '../../utils/fonts';
 import './SubNav.css';
 
 export function SubNav() {
-  const { settings, setSelectedFont, setRomanizationDisplay, setPronunciationMode, toggleRomanizationPanel } = useSettings();
+  const { settings, setSelectedFont, setShowHoverTooltips, setPronunciationMode, setShowRomanizationPanel } = useSettings();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFontSectionOpen, setIsFontSectionOpen] = useState(false);
   const settingsRef = useRef<HTMLDivElement>(null);
@@ -103,12 +103,12 @@ export function SubNav() {
                     onClick={() => setPronunciationMode('ipa')}
                   >
                     <span className="option-title">IPA</span>
-                    <span className="option-desc">Linguistic (/soːm/)</span>
+                    <span className="option-desc">Linguistic (suă-stei)</span>
                   </button>
                 </div>
               </div>
               
-              {/* Display Toggles */}
+              {/* Display Toggles - Now independent */}
               <div className="settings-section">
                 <label className="settings-label">Display Options</label>
                 <div className="settings-toggles">
@@ -117,8 +117,8 @@ export function SubNav() {
                     <input 
                       type="checkbox" 
                       className="toggle-checkbox"
-                      checked={settings.romanizationDisplay === 'hover'}
-                      onChange={(e) => setRomanizationDisplay(e.target.checked ? 'hover' : 'panel')}
+                      checked={settings.showHoverTooltips}
+                      onChange={(e) => setShowHoverTooltips(e.target.checked)}
                     />
                     <span className="toggle-switch" />
                   </label>
@@ -128,7 +128,7 @@ export function SubNav() {
                       type="checkbox" 
                       className="toggle-checkbox"
                       checked={settings.showRomanizationPanel}
-                      onChange={toggleRomanizationPanel}
+                      onChange={(e) => setShowRomanizationPanel(e.target.checked)}
                     />
                     <span className="toggle-switch" />
                   </label>
