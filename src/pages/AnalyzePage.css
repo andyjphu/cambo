@@ -399,6 +399,11 @@
   color: var(--color-accent);
 }
 
+.dict-phonetic.ipa-mode {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
 .dict-english {
   font-weight: 500;
   color: var(--color-text);
