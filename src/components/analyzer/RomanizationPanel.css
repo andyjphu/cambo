@@ -1,0 +1,75 @@
+/* Romanization Panel - Shows romanized text in a separate display */
+.romanization-panel {
+  margin-top: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.625rem 1rem;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.panel-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-secondary);
+}
+
+.panel-mode {
+  font-size: 0.625rem;
+  font-weight: 500;
+  padding: 0.125rem 0.5rem;
+  background: rgba(0, 122, 255, 0.1);
+  color: var(--color-accent);
+  border-radius: 4px;
+}
+
+.panel-content {
+  padding: 1rem 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  line-height: 2;
+  color: var(--color-text);
+}
+
+.rom-item {
+  display: inline;
+}
+
+.rom-space {
+  display: inline;
+  margin: 0 0.5rem;
+}
+
+.rom-phonetic {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.rom-english {
+  font-size: 0.875rem;
+  color: var(--color-tertiary);
+  font-weight: 400;
+  margin-left: 0.25rem;
+}
+
+.rom-item:not(:last-child)::after {
+  content: '-';
+  color: var(--color-border);
+  margin: 0 0.125rem;
+}
+
+.rom-item:has(+ .rom-space)::after,
+.rom-space + .rom-item::before {
+  content: none;
+}
+

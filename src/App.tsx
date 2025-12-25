@@ -1,39 +1,44 @@
-import { KhmerAnalyzer } from './components/KhmerAnalyzer'
-import './App.css'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { SettingsProvider } from './context/SettingsContext';
+import { Navbar } from './components/layout/Navbar';
+import { SubNav } from './components/layout/SubNav';
+import { AnalyzePage } from './pages/AnalyzePage';
+import { LookupPage } from './pages/LookupPage';
+import './App.css';
 
 function App() {
   return (
-    <div className="app">
-      <header className="header">
-        <div className="header-content">
-          <div className="logo">
-            <span className="logo-icon">ក</span>
-            <span className="logo-text">cambo</span>
-          </div>
-          <p className="tagline">Khmer text analysis & pronunciation</p>
+    <BrowserRouter>
+      <SettingsProvider>
+        <div className="app">
+          <Navbar />
+          <SubNav />
+          
+          <main className="main">
+            <Routes>
+              <Route path="/" element={<AnalyzePage />} />
+              <Route path="/lookup" element={<LookupPage />} />
+            </Routes>
+          </main>
+          
+          <footer className="footer">
+            <div className="footer-content">
+              <p className="footer-text">
+                Built with precision for the Khmer language
+              </p>
+              <div className="footer-links">
+                <span className="footer-link">ALA-LC Romanization</span>
+                <span className="footer-divider">·</span>
+                <span className="footer-link">~150 Core Words</span>
+                <span className="footer-divider">·</span>
+                <span className="footer-link">Fuzzy Search</span>
+              </div>
+            </div>
+          </footer>
         </div>
-      </header>
-
-      <main className="main">
-        <KhmerAnalyzer initialText="សួស្តី ខ្ញុំ ស្រឡាញ់ កម្ពុជា" />
-      </main>
-
-      <footer className="footer">
-        <div className="footer-content">
-          <p className="footer-text">
-            Built with precision for the Khmer language
-          </p>
-          <div className="footer-links">
-            <span className="footer-link">Character Analysis</span>
-            <span className="footer-divider">·</span>
-            <span className="footer-link">IPA Pronunciation</span>
-            <span className="footer-divider">·</span>
-            <span className="footer-link">Translation</span>
-          </div>
-        </div>
-      </footer>
-    </div>
-  )
+      </SettingsProvider>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;

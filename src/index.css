@@ -1,24 +1,31 @@
 /* Swiss Design System - Global Styles */
 
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;500;600;700&display=swap');
+/* 
+ * Minimal Font Loading Strategy:
+ * - Only load Noto Sans Khmer by default (essential for rendering)
+ * - Other fonts are lazy-loaded when the font selector is opened
+ * - This saves ~400-500KB on initial load
+ */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;500;600;700&display=swap");
 
 /* CSS Variables */
 :root {
   /* Typography */
-  --font-sans: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-  --font-khmer: 'Noto Sans Khmer', 'Khmer OS', sans-serif;
-  
+  --font-sans: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+  --font-mono: "SF Mono", "Fira Code", "Consolas", monospace;
+  --font-khmer: "Noto Sans Khmer", "Khmer OS", sans-serif;
+
   /* Colors - Light Theme */
-  --color-bg: #FAFAFA;
-  --color-surface: #FFFFFF;
-  --color-text: #1D1D1F;
-  --color-secondary: #3C3C43;
-  --color-tertiary: #8E8E93;
-  --color-border: #E5E5EA;
-  --color-accent: #007AFF;
-  --color-accent-light: #64D2FF;
-  
+  --color-bg: #fafafa;
+  --color-surface: #ffffff;
+  --color-text: #1d1d1f;
+  --color-secondary: #3c3c43;
+  --color-tertiary: #8e8e93;
+  --color-border: #e5e5ea;
+  --color-accent: #007aff;
+  --color-accent-light: #64d2ff;
+
   /* Spacing */
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
@@ -26,12 +33,12 @@
   --space-lg: 1.5rem;
   --space-xl: 2rem;
   --space-2xl: 3rem;
-  
+
   /* Radii */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -39,7 +46,9 @@
 }
 
 /* Reset */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -65,7 +74,12 @@ body {
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.2;
