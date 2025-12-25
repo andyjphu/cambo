@@ -1,37 +1,78 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { khmerFonts, type KhmerFont } from '../utils/fonts';
 
 export type PronunciationMode = 'ipa' | 'phonetic';
-export type RomanizationDisplay = 'hover' | 'panel';
 
 interface Settings {
   selectedFont: KhmerFont;
   pronunciationMode: PronunciationMode;
-  romanizationDisplay: RomanizationDisplay;
-  showRomanizationPanel: boolean;
+  showHoverTooltips: boolean;      // Independent toggle for hover tooltips
+  showRomanizationPanel: boolean;  // Independent toggle for romanization panel
 }
 
 interface SettingsContextType {
   settings: Settings;
   setSelectedFont: (font: KhmerFont) => void;
   setPronunciationMode: (mode: PronunciationMode) => void;
-  setRomanizationDisplay: (display: RomanizationDisplay) => void;
-  toggleRomanizationPanel: () => void;
+  setShowHoverTooltips: (show: boolean) => void;
+  setShowRomanizationPanel: (show: boolean) => void;
 }
+
+const STORAGE_KEY = 'cambo-settings';
 
 const defaultFont = khmerFonts.find(f => f.name === 'Noto Sans Khmer') || khmerFonts[0];
 
 const defaultSettings: Settings = {
   selectedFont: defaultFont,
   pronunciationMode: 'phonetic',
-  romanizationDisplay: 'hover',
-  showRomanizationPanel: true, // Show panel by default
+  showHoverTooltips: true,        // Hover tooltips on by default
+  showRomanizationPanel: true,    // Romanization panel on by default
 };
+
+// Load settings from localStorage
+function loadSettings(): Settings {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Restore font from stored name
+      const font = khmerFonts.find(f => f.name === parsed.selectedFontName) || defaultFont;
+      return {
+        selectedFont: font,
+        pronunciationMode: parsed.pronunciationMode || defaultSettings.pronunciationMode,
+        showHoverTooltips: parsed.showHoverTooltips ?? defaultSettings.showHoverTooltips,
+        showRomanizationPanel: parsed.showRomanizationPanel ?? defaultSettings.showRomanizationPanel,
+      };
+    }
+  } catch (e) {
+    console.warn('Failed to load settings from localStorage:', e);
+  }
+  return defaultSettings;
+}
+
+// Save settings to localStorage
+function saveSettings(settings: Settings) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      selectedFontName: settings.selectedFont.name,
+      pronunciationMode: settings.pronunciationMode,
+      showHoverTooltips: settings.showHoverTooltips,
+      showRomanizationPanel: settings.showRomanizationPanel,
+    }));
+  } catch (e) {
+    console.warn('Failed to save settings to localStorage:', e);
+  }
+}
 
 const SettingsContext = createContext<SettingsContextType | null>(null);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<Settings>(defaultSettings);
+  const [settings, setSettings] = useState<Settings>(loadSettings);
+
+  // Save to localStorage whenever settings change
+  useEffect(() => {
+    saveSettings(settings);
+  }, [settings]);
 
   const setSelectedFont = useCallback((font: KhmerFont) => {
     setSettings(prev => ({ ...prev, selectedFont: font }));
@@ -41,16 +82,12 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setSettings(prev => ({ ...prev, pronunciationMode: mode }));
   }, []);
 
-  const setRomanizationDisplay = useCallback((display: RomanizationDisplay) => {
-    setSettings(prev => ({ 
-      ...prev, 
-      romanizationDisplay: display,
-      showRomanizationPanel: display === 'panel',
-    }));
+  const setShowHoverTooltips = useCallback((show: boolean) => {
+    setSettings(prev => ({ ...prev, showHoverTooltips: show }));
   }, []);
 
-  const toggleRomanizationPanel = useCallback(() => {
-    setSettings(prev => ({ ...prev, showRomanizationPanel: !prev.showRomanizationPanel }));
+  const setShowRomanizationPanel = useCallback((show: boolean) => {
+    setSettings(prev => ({ ...prev, showRomanizationPanel: show }));
   }, []);
 
   return (
@@ -58,8 +95,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       settings,
       setSelectedFont,
       setPronunciationMode,
-      setRomanizationDisplay,
-      toggleRomanizationPanel,
+      setShowHoverTooltips,
+      setShowRomanizationPanel,
     }}>
       {children}
     </SettingsContext.Provider>
@@ -73,4 +110,3 @@ export function useSettings() {
   }
   return context;
 }
-
