@@ -26,7 +26,7 @@ function App() {
           <footer className="footer">
             <div className="footer-content">
               <p className="footer-text">
-                Built with precision for the Khmer language
+                © 2025 Andy Phu
               </p>
               <div className="footer-links">
                 <span className="footer-link">ALA-LC Romanization</span>

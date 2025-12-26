@@ -1,8 +1,29 @@
 /* Analyze Page Styles */
 .analyze-page {
-  max-width: 900px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 1.5rem 1.25rem;
+}
+
+/* Two-column layout for Khmer Text and Character Analysis */
+.panels-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.panel-left,
+.panel-right {
+  margin-bottom: 0;
+}
+
+/* Responsive: stack on smaller screens */
+@media (max-width: 1024px) {
+  .panels-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
 }
 
 /* Panel hint text */
@@ -65,11 +86,21 @@
   display: inline;
   position: relative;
   border-radius: 6px;
-  padding: 0.125rem 0.25rem;
-  margin: 0 0.125rem;
   transition: all 0.15s ease;
   cursor: pointer;
   background: var(--syllable-bg, transparent);
+}
+
+/* Sparse mode - adds spacing for better readability */
+.input-cluster.sparse {
+  padding: 0.125rem 0.25rem;
+  margin: 0 0.125rem;
+}
+
+/* Condensed mode - no extra spacing, matches textarea exactly */
+.input-cluster.condensed {
+  padding: 0;
+  margin: 0;
 }
 
 .input-cluster:hover {
@@ -79,6 +110,42 @@
 .input-cluster.highlighted {
   box-shadow: 0 0 0 3px var(--syllable-accent, var(--color-accent));
   animation: pulse 1s ease-in-out infinite;
+}
+
+/* Condensed mode highlighting - use outline instead of box-shadow to avoid layout shift */
+.input-cluster.condensed {
+  border-radius: 0;
+}
+
+.input-cluster.condensed.highlighted {
+  box-shadow: none;
+  outline: 3px solid var(--syllable-accent, var(--color-accent));
+  outline-offset: -3px;
+  animation: pulseCondensed 1s ease-in-out infinite;
+}
+
+.input-cluster.condensed:hover {
+  box-shadow: none;
+  outline: 2px solid var(--syllable-accent, var(--color-accent));
+  outline-offset: -2px;
+}
+
+/* Ensure condensed mode display has no extra spacing */
+.khmer-display.condensed {
+  letter-spacing: 0;
+  word-spacing: 0;
+}
+
+@keyframes pulseCondensed {
+  0%,
+  100% {
+    outline-width: 3px;
+    outline-offset: -3px;
+  }
+  50% {
+    outline-width: 4px;
+    outline-offset: -4px;
+  }
 }
 
 .input-space {
@@ -145,18 +212,40 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+}
+
+/* Sparse mode - adds spacing */
+.rainbow-text.sparse {
   gap: 0.25rem;
+}
+
+/* Condensed mode - no spacing */
+.rainbow-text.condensed {
+  gap: 0;
+  letter-spacing: 0;
+  word-spacing: 0;
 }
 
 .cluster-wrapper {
   display: inline-flex;
   align-items: baseline;
   position: relative;
-  padding: 0.25rem 0.125rem;
   border-radius: 8px;
   transition: all 0.15s ease;
-  margin: 0.125rem;
   cursor: pointer;
+}
+
+/* Sparse mode - adds spacing */
+.cluster-wrapper.sparse {
+  padding: 0.25rem 0.125rem;
+  margin: 0.125rem;
+}
+
+/* Condensed mode - no spacing */
+.cluster-wrapper.condensed {
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
 }
 
 .cluster-wrapper:hover {
@@ -166,6 +255,26 @@
 .cluster-wrapper.cluster-highlighted {
   box-shadow: 0 0 0 3px var(--syllable-accent, var(--color-accent));
   animation: clusterPulse 1s ease-in-out infinite;
+}
+
+/* Condensed mode highlighting - use outline instead of box-shadow */
+.cluster-wrapper.condensed.cluster-highlighted {
+  box-shadow: none;
+  outline: 3px solid var(--syllable-accent, var(--color-accent));
+  outline-offset: -3px;
+  animation: clusterPulseCondensed 1s ease-in-out infinite;
+}
+
+.cluster-wrapper.condensed:hover {
+  box-shadow: none;
+  outline: 2px solid var(--syllable-accent, var(--color-accent));
+  outline-offset: -2px;
+}
+
+.cluster-wrapper.condensed.cluster-selected {
+  box-shadow: none;
+  outline: 3px solid var(--color-accent);
+  outline-offset: -3px;
 }
 
 /* Selection mode styling */
@@ -209,6 +318,18 @@
   }
 }
 
+@keyframes clusterPulseCondensed {
+  0%,
+  100% {
+    outline-width: 3px;
+    outline-offset: -3px;
+  }
+  50% {
+    outline-width: 4px;
+    outline-offset: -4px;
+  }
+}
+
 .word-separator {
   display: inline-flex;
   align-items: center;
@@ -229,7 +350,6 @@
 
 .char-component {
   position: relative;
-  padding: 0.125rem 0.25rem;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -237,10 +357,29 @@
   color: var(--color-text);
 }
 
+/* Sparse mode - adds spacing */
+.char-component.sparse {
+  padding: 0.125rem 0.25rem;
+}
+
+/* Condensed mode - no spacing */
+.char-component.condensed {
+  padding: 0;
+  border-radius: 0;
+}
+
 .char-component:hover {
   transform: scale(1.05);
   z-index: 10;
   box-shadow: 0 0 0 2px var(--syllable-accent, var(--color-accent));
+}
+
+/* Condensed mode hover - use outline */
+.char-component.condensed:hover {
+  transform: none;
+  box-shadow: none;
+  outline: 2px solid var(--syllable-accent, var(--color-accent));
+  outline-offset: -2px;
 }
 
 /* Component-level highlighting - when specific component is selected */
@@ -253,19 +392,45 @@
   /* No animation - keeps tooltip stable */
 }
 
+/* Condensed mode component highlighting */
+.char-component.condensed.comp-highlighted {
+  transform: none;
+  box-shadow: none;
+  outline: 3px solid var(--syllable-accent, var(--color-accent));
+  outline-offset: -3px;
+}
+
 /* Old tooltip styles removed - now using portal-based Tooltip component */
 
 /* Legend - inside collapsible panel */
 .legend {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 1rem;
-  justify-content: center;
-  align-items: center;
 }
 
 .legend.syllable-legend {
-  gap: 1.5rem;
+  gap: 1.25rem;
+}
+
+.legend-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.legend-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 0.25rem;
+}
+
+.legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
 }
 
 .legend-item {
@@ -275,47 +440,42 @@
 }
 
 .legend-color {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 3px;
   border: 2px solid;
+  flex-shrink: 0;
 }
 
-/* Shade indicators for syllable legend */
+/* Shade indicators for syllable legend - using blue as example */
 .legend-color.dark {
   background: rgba(0, 122, 255, 0.25);
-  border-color: var(--color-accent);
+  border-color: #007AFF;
 }
 
 .legend-color.medium {
   background: rgba(0, 122, 255, 0.15);
-  border-color: var(--color-accent);
+  border-color: #007AFF;
 }
 
 .legend-color.light {
   background: rgba(0, 122, 255, 0.08);
-  border-color: var(--color-accent);
-}
-
-.legend-separator {
-  width: 1px;
-  height: 16px;
-  background: var(--color-border);
-  margin: 0 0.5rem;
+  border-color: #007AFF;
 }
 
 .legend-label {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--color-secondary);
 }
 
 .legend-note {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: var(--color-tertiary);
-  font-style: italic;
-  padding-left: 1rem;
-  border-left: 1px solid var(--color-border);
+  line-height: 1.5;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+  margin-top: 0.25rem;
 }
 
 /* Word Row */
@@ -574,9 +734,19 @@
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .panels-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 640px) {
   .analyze-page {
-    padding: 1.5rem 1rem;
+    padding: 1rem 0.75rem;
+  }
+
+  .panels-row {
+    gap: 0.5rem;
   }
 
   .rainbow-text {

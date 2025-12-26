@@ -31,12 +31,17 @@
   color: #EF4444;
 }
 
-/* Tooltip */
-.warning-tooltip {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
+/* Portal-based tooltip wrapper */
+.warning-tooltip-portal {
+  position: fixed;
   transform: translateX(-50%);
+  z-index: 100000;
+  pointer-events: none;
+  animation: warningTooltipFadeIn 0.15s ease;
+}
+
+/* Tooltip content */
+.warning-tooltip {
   min-width: 220px;
   max-width: 280px;
   padding: 0;
@@ -44,20 +49,26 @@
   color: var(--color-bg);
   border-radius: 10px;
   font-size: 0.8125rem;
-  z-index: 300;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-  animation: warningTooltipFadeIn 0.15s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   overflow: hidden;
 }
 
-.warning-tooltip::after {
-  content: '';
+/* Tooltip arrow */
+.warning-tooltip-arrow {
   position: absolute;
-  top: 100%;
   left: 50%;
   transform: translateX(-50%);
   border: 6px solid transparent;
+}
+
+.warning-tooltip-portal.top .warning-tooltip-arrow {
+  top: 100%;
   border-top-color: var(--color-text);
+}
+
+.warning-tooltip-portal.bottom .warning-tooltip-arrow {
+  bottom: 100%;
+  border-bottom-color: var(--color-text);
 }
 
 .warning-tooltip.yellow .warning-tooltip-header {

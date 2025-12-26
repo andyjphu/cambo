@@ -10,6 +10,7 @@ import { RomanizationPanel } from '../components/analyzer/RomanizationPanel';
 import { ConfidenceWarning } from '../components/analyzer/ConfidenceWarning';
 import { SpaceEditor } from '../components/analyzer/SpaceEditor';
 import { SelectionPanel } from '../components/analyzer/SelectionPanel';
+import { BsArrowsAngleContract } from 'react-icons/bs';
 import './AnalyzePage.css';
 
 const TYPE_LABELS: Record<KhmerCharType, string> = {
@@ -47,7 +48,6 @@ interface PanelStates {
   wordBoundaries: boolean;
   romanization: boolean;
   characterAnalysis: boolean;
-  legend: boolean;
   dictionaryMatches: boolean;
 }
 
@@ -56,7 +56,6 @@ const DEFAULT_PANEL_STATES: PanelStates = {
   wordBoundaries: true,
   romanization: true,
   characterAnalysis: true,
-  legend: true,
   dictionaryMatches: true,
 };
 
@@ -86,6 +85,8 @@ export function AnalyzePage() {
   const [inputText, setInputText] = useState(loadInputText);
   const [isEditMode, setIsEditMode] = useState(true);
   const [panelStates, setPanelStates] = useState<PanelStates>(loadPanelStates);
+  const [isCondensedMode, setIsCondensedMode] = useState(false);
+  const [isAnalysisCondensedMode, setIsAnalysisCondensedMode] = useState(false);
 
   // Persist input text to localStorage
   useEffect(() => {
@@ -252,7 +253,16 @@ export function AnalyzePage() {
   const handleClusterHover = useCallback((clusterIdx: number | null, compIdx: number | null = null, element?: HTMLSpanElement | null) => {
     setHoveredClusterIdx(clusterIdx);
     setHoveredCompIdx(compIdx);
-    tooltipTriggerRef.current = element || null;
+    // Set tooltip trigger ref to the element that triggered the hover
+    if (clusterIdx !== null && element) {
+      tooltipTriggerRef.current = element;
+    } else if (clusterIdx !== null) {
+      // If no element provided, try to find it from refs
+      const clusterElement = clusterRefs.current.get(clusterIdx) || inputClusterRefs.current.get(clusterIdx);
+      tooltipTriggerRef.current = clusterElement || null;
+    } else {
+      tooltipTriggerRef.current = null;
+    }
   }, []);
 
   const handleClusterClick = useCallback((clusterIdx: number, compIdx: number | null = null, source: 'input' | 'analysis' = 'input') => {
@@ -388,189 +398,149 @@ export function AnalyzePage() {
 
   return (
     <div className="analyze-page">
-      {/* Khmer Text Panel */}
-      <CollapsiblePanel
-        title="Khmer Text"
-        isExpanded={panelStates.khmerText}
-        onToggle={() => togglePanel('khmerText')}
-        actionButton={
-          isEditMode ? (
-            <button
-              className="panel-action-btn confirm"
-              onClick={handleConfirmText}
-              title="Confirm and auto-segment text"
-              disabled={!inputText.trim()}
-            >
-              <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
-              </svg>
-            </button>
-          ) : (
-            <button
-              className="panel-action-btn edit"
-              onClick={() => setIsEditMode(true)}
-              title="Edit text"
-            >
-              <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                <path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Z" />
-              </svg>
-            </button>
-          )
-        }
-      >
-        {isEditMode ? (
-          <textarea
-            id="khmer-input"
-            className="khmer-input"
-            style={khmerFontStyle}
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder="សូមសរសេរភាសាខ្មែរនៅទីនេះ..."
-            rows={3}
-          />
-        ) : (
-          <div className="khmer-display" style={khmerFontStyle}>
-            {inputText ? (
-              clusters.map((cluster, clusterIdx) => {
-                if (cluster.type === 'space') {
-                  return <span key={clusterIdx} className="input-space"> </span>;
-                }
-
-                const nonSpaceIdx = getNonSpaceIdx(clusterIdx);
-                const syllableColor = getClusterColor(clusterIdx, nonSpaceIdx);
-                const isHighlighted = activeClusterIdx === clusterIdx;
-
-                return (
-                  <span
-                    key={clusterIdx}
-                    ref={(el) => {
-                      if (el) inputClusterRefs.current.set(clusterIdx, el);
-                      else inputClusterRefs.current.delete(clusterIdx);
-                    }}
-                    className={`input-cluster ${isHighlighted ? 'highlighted' : ''}`}
-                    style={{
-                      '--syllable-accent': syllableColor.accent,
-                      '--syllable-bg': syllableColor.bgMedium,
-                    } as React.CSSProperties}
-                    onMouseEnter={() => handleClusterHover(clusterIdx)}
-                    onMouseLeave={() => handleClusterHover(null)}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleClusterClick(clusterIdx, null, 'input');
-                    }}
-                  >
-                    {cluster.text}
-                  </span>
-                );
-              })
-            ) : (
-              <span className="placeholder">Click edit to add text...</span>
-            )}
-          </div>
-        )}
-      </CollapsiblePanel>
-
-      {/* Space Editor - for manual word boundary editing (collapsible) */}
-      {inputText && (
+      {/* Two-column layout: Khmer Text and Character Analysis side by side */}
+      <div className="panels-row">
+        {/* Khmer Text Panel */}
         <CollapsiblePanel
-          title="Word Boundaries"
-          isExpanded={panelStates.wordBoundaries}
-          onToggle={() => togglePanel('wordBoundaries')}
+          title="Khmer Text"
+          isExpanded={panelStates.khmerText}
+          onToggle={() => togglePanel('khmerText')}
+          className="panel-left"
           actionButton={
-            !isEditMode && !isEditingBoundaries ? (
-              <button
-                className="panel-action-btn edit"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsEditingBoundaries(true);
-                }}
-                title="Edit word boundaries"
-              >
-                <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                  <path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Z" />
-                </svg>
-              </button>
-            ) : isEditingBoundaries ? (
-              <button
-                className="panel-action-btn confirm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsEditingBoundaries(false);
-                }}
-                title="Done editing boundaries"
-              >
-                <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                  <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
-                </svg>
-              </button>
-            ) : undefined
+            <>
+              {!isEditMode && (
+                <button
+                  className={`panel-action-btn ${isCondensedMode ? 'active' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsCondensedMode(!isCondensedMode);
+                  }}
+                  title={isCondensedMode ? 'Switch to sparse mode' : 'Switch to condensed mode'}
+                >
+                  <BsArrowsAngleContract size={14} />
+                </button>
+              )}
+              {isEditMode ? (
+                <button
+                  className="panel-action-btn confirm"
+                  onClick={handleConfirmText}
+                  title="Confirm and auto-segment text"
+                  disabled={!inputText.trim()}
+                >
+                  <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
+                    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
+                  </svg>
+                </button>
+              ) : (
+                <button
+                  className="panel-action-btn edit"
+                  onClick={() => setIsEditMode(true)}
+                  title="Edit text"
+                >
+                  <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
+                    <path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Z" />
+                  </svg>
+                </button>
+              )}
+            </>
           }
         >
-          <SpaceEditor
-            text={inputText}
-            onTextChange={setInputText}
-            disabled={isEditMode}
-            isEditing={isEditingBoundaries}
-          />
+          {isEditMode ? (
+            <textarea
+              id="khmer-input"
+              className="khmer-input"
+              style={khmerFontStyle}
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="សូមសរសេរភាសាខ្មែរនៅទីនេះ..."
+              rows={3}
+            />
+          ) : (
+            <div className={`khmer-display ${isCondensedMode ? 'condensed' : 'sparse'}`} style={khmerFontStyle}>
+              {inputText ? (
+                clusters.map((cluster, clusterIdx) => {
+                  if (cluster.type === 'space') {
+                    return <span key={clusterIdx} className="input-space"> </span>;
+                  }
+
+                  const nonSpaceIdx = getNonSpaceIdx(clusterIdx);
+                  const syllableColor = getClusterColor(clusterIdx, nonSpaceIdx);
+                  const isHighlighted = activeClusterIdx === clusterIdx;
+
+                  return (
+                    <span
+                      key={clusterIdx}
+                      ref={(el) => {
+                        if (el) inputClusterRefs.current.set(clusterIdx, el);
+                        else inputClusterRefs.current.delete(clusterIdx);
+                      }}
+                      className={`input-cluster ${isHighlighted ? 'highlighted' : ''} ${isCondensedMode ? 'condensed' : 'sparse'}`}
+                      style={{
+                        '--syllable-accent': syllableColor.accent,
+                        '--syllable-bg': syllableColor.bgMedium,
+                      } as React.CSSProperties}
+                      onMouseEnter={(e) => handleClusterHover(clusterIdx, null, e.currentTarget)}
+                      onMouseLeave={() => handleClusterHover(null)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleClusterClick(clusterIdx, null, 'input');
+                      }}
+                    >
+                      {cluster.text}
+                    </span>
+                  );
+                })
+              ) : (
+                <span className="placeholder">Click edit to add text...</span>
+              )}
+            </div>
+          )}
         </CollapsiblePanel>
-      )}
 
-      {/* Romanization Panel (collapsible) */}
-      <CollapsiblePanel
-        title="Romanization"
-        badge={settings.pronunciationMode === 'ipa' ? 'ALA-LC' : 'Phonetic'}
-        isExpanded={panelStates.romanization}
-        onToggle={() => togglePanel('romanization')}
-      >
-        <RomanizationPanel
-          text={inputText}
-          clusters={clusters}
-          activeClusterIdx={activeClusterIdx}
-          onClusterHover={handleClusterHover}
-          onClusterClick={handleClusterClick}
-          getNonSpaceIdx={getNonSpaceIdx}
-        />
-      </CollapsiblePanel>
-
-      {inputText && (
-        <>
-          {/* Character Analysis */}
+        {/* Character Analysis Panel */}
+        {inputText && (
           <CollapsiblePanel
             title="Character Analysis"
             badge={isSelectionMode ? 'Selection Mode' : undefined}
             isExpanded={panelStates.characterAnalysis}
             onToggle={() => togglePanel('characterAnalysis')}
+            className="panel-right"
             actionButton={
-              <button
-                className={`panel-action-btn selection ${isSelectionMode ? 'active' : ''}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleSelectionMode();
-                }}
-                title={isSelectionMode ? 'Exit selection mode' : 'Select syllables to copy or add to dictionary'}
-              >
-                {isSelectionMode ? (
-                  <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                    <path d="M5.75 7.5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Zm5.25.75a.75.75 0 0 0-1.5 0v1.5a.75.75 0 0 0 1.5 0v-1.5Z" />
-                    <path d="M6.25 0a.75.75 0 0 0 0 1.5H7.5v2H3.75A1.75 1.75 0 0 0 2 5.25v.5a.75.75 0 0 0 1.5 0v-.5a.25.25 0 0 1 .25-.25H7.5v3.5H5.75a.75.75 0 0 0 0 1.5H7.5v.5c0 .69.28 1.315.732 1.768l1.5 1.5a.75.75 0 0 0 1.06-1.06l-1.5-1.5A.25.25 0 0 1 9 10.5V10h2.25a.75.75 0 0 0 0-1.5H9V5h3.25a.25.25 0 0 1 .25.25v.5a.75.75 0 0 0 1.5 0v-.5A1.75 1.75 0 0 0 12.25 3.5H9v-2h1.25a.75.75 0 0 0 0-1.5h-4Z" />
-                  </svg>
-                )}
-              </button>
+              <>
+                <button
+                  className={`panel-action-btn ${isAnalysisCondensedMode ? 'active' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsAnalysisCondensedMode(!isAnalysisCondensedMode);
+                  }}
+                  title={isAnalysisCondensedMode ? 'Switch to sparse mode' : 'Switch to condensed mode'}
+                >
+                  <BsArrowsAngleContract size={14} />
+                </button>
+                <button
+                  className={`panel-action-btn selection ${isSelectionMode ? 'active' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleSelectionMode();
+                  }}
+                  title={isSelectionMode ? 'Exit selection mode' : 'Select syllables to copy or add to dictionary'}
+                >
+                  {isSelectionMode ? (
+                    <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
+                      <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
+                      <path d="M5.75 7.5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Zm5.25.75a.75.75 0 0 0-1.5 0v1.5a.75.75 0 0 0 1.5 0v-1.5Z" />
+                      <path d="M6.25 0a.75.75 0 0 0 0 1.5H7.5v2H3.75A1.75 1.75 0 0 0 2 5.25v.5a.75.75 0 0 0 1.5 0v-.5a.25.25 0 0 1 .25-.25H7.5v3.5H5.75a.75.75 0 0 0 0 1.5H7.5v.5c0 .69.28 1.315.732 1.768l1.5 1.5a.75.75 0 0 0 1.06-1.06l-1.5-1.5A.25.25 0 0 1 9 10.5V10h2.25a.75.75 0 0 0 0-1.5H9V5h3.25a.25.25 0 0 1 .25.25v.5a.75.75 0 0 0 1.5 0v-.5A1.75 1.75 0 0 0 12.25 3.5H9v-2h1.25a.75.75 0 0 0 0-1.5h-4Z" />
+                    </svg>
+                  )}
+                </button>
+              </>
             }
           >
             <div className="character-analysis-content">
-              <p className="panel-hint">
-                {isSelectionMode
-                  ? 'Click syllables to select, then use the panel to copy or add to dictionary'
-                  : !isEditMode
-                    ? 'Hover components for syllable, word & character details'
-                    : 'Each syllable has a unique color'}
-              </p>
-              <div className="rainbow-text" style={khmerFontStyle} ref={charAnalysisRef}>
+              <div className={`rainbow-text ${isAnalysisCondensedMode ? 'condensed' : 'sparse'}`} style={khmerFontStyle} ref={charAnalysisRef}>
                 {clusters.map((cluster, clusterIdx) => {
                   if (cluster.type === 'space') {
                     return (
@@ -592,7 +562,7 @@ export function AnalyzePage() {
                         if (el) clusterRefs.current.set(clusterIdx, el);
                         else clusterRefs.current.delete(clusterIdx);
                       }}
-                      className={`cluster-wrapper ${isClusterHighlighted ? 'cluster-highlighted' : ''} ${isSelected ? 'cluster-selected' : ''} ${isSelectionMode ? 'selection-mode' : ''}`}
+                      className={`cluster-wrapper ${isClusterHighlighted ? 'cluster-highlighted' : ''} ${isSelected ? 'cluster-selected' : ''} ${isSelectionMode ? 'selection-mode' : ''} ${isAnalysisCondensedMode ? 'condensed' : 'sparse'}`}
                       style={{ '--syllable-accent': syllableColor.accent } as React.CSSProperties}
                       onMouseEnter={(e) => !isSelectionMode && handleClusterHover(clusterIdx, null, e.currentTarget)}
                       onMouseLeave={() => !isSelectionMode && handleClusterHover(null, null, null)}
@@ -612,7 +582,7 @@ export function AnalyzePage() {
                         return (
                           <span
                             key={compIdx}
-                            className={`char-component ${isCompHighlighted ? 'comp-highlighted' : ''}`}
+                            className={`char-component ${isCompHighlighted ? 'comp-highlighted' : ''} ${isAnalysisCondensedMode ? 'condensed' : 'sparse'}`}
                             style={{
                               backgroundColor: compBg,
                               '--syllable-accent': syllableColor.accent,
@@ -643,33 +613,79 @@ export function AnalyzePage() {
               </div>
             </div>
           </CollapsiblePanel>
+        )}
+      </div>
 
-          {/* Legend - shows shade meaning within syllables */}
+      {/* Second row: Romanization and Word Boundaries */}
+      <div className="panels-row">
+        {/* Romanization Panel (collapsible) */}
+        <CollapsiblePanel
+          title="Romanization"
+          badge={settings.pronunciationMode === 'ipa' ? 'ALA-LC' : 'Phonetic'}
+          isExpanded={panelStates.romanization}
+          onToggle={() => togglePanel('romanization')}
+          className="panel-left"
+        >
+          <RomanizationPanel
+            text={inputText}
+            clusters={clusters}
+            activeClusterIdx={activeClusterIdx}
+            onClusterHover={handleClusterHover}
+            onClusterClick={handleClusterClick}
+            getNonSpaceIdx={getNonSpaceIdx}
+          />
+        </CollapsiblePanel>
+
+        {/* Word Boundaries Panel */}
+        {inputText && (
           <CollapsiblePanel
-            title="Legend"
-            isExpanded={panelStates.legend}
-            onToggle={() => togglePanel('legend')}
+            title="Word Boundaries"
+            isExpanded={panelStates.wordBoundaries}
+            onToggle={() => togglePanel('wordBoundaries')}
+            className="panel-right"
+            actionButton={
+              !isEditMode && !isEditingBoundaries ? (
+                <button
+                  className="panel-action-btn edit"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEditingBoundaries(true);
+                  }}
+                  title="Edit word boundaries"
+                >
+                  <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
+                    <path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Z" />
+                  </svg>
+                </button>
+              ) : isEditingBoundaries ? (
+                <button
+                  className="panel-action-btn confirm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEditingBoundaries(false);
+                  }}
+                  title="Done editing boundaries"
+                >
+                  <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
+                    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
+                  </svg>
+                </button>
+              ) : undefined
+            }
           >
-            <div className="legend syllable-legend">
-              <div className="legend-item">
-                <span className="legend-color dark" />
-                <span className="legend-label">Base consonant</span>
-              </div>
-              <div className="legend-item">
-                <span className="legend-color medium" />
-                <span className="legend-label">Subscript/coeng</span>
-              </div>
-              <div className="legend-item">
-                <span className="legend-color light" />
-                <span className="legend-label">Vowel/sign</span>
-              </div>
-              <span className="legend-note">Each syllable gets a unique color</span>
-            </div>
+            <SpaceEditor
+              text={inputText}
+              onTextChange={setInputText}
+              disabled={isEditMode}
+              isEditing={isEditingBoundaries}
+            />
           </CollapsiblePanel>
+        )}
+      </div>
 
-          {/* Dictionary Matches */}
-          {words.some((w) => getDictionaryEntry(w.word)) && (
-            <CollapsiblePanel
+      {/* Dictionary Matches */}
+      {inputText && words.some((w) => getDictionaryEntry(w.word)) && (
+        <CollapsiblePanel
               title="Dictionary Matches"
               badge={`${words.filter(w => getDictionaryEntry(w.word)).length} words`}
               isExpanded={panelStates.dictionaryMatches}
@@ -715,8 +731,6 @@ export function AnalyzePage() {
                 })}
               </div>
             </CollapsiblePanel>
-          )}
-        </>
       )}
 
       {/* Selection Panel - left sidebar for selection tools */}

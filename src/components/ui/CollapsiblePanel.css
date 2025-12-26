@@ -1,0 +1,148 @@
+/* Collapsible Panel - Unified panel component */
+.collapsible-panel {
+  margin-bottom: 0.75rem;
+  background: var(--color-surface);
+  border-radius: var(--panel-radius);
+  border: 1px solid var(--color-border);
+}
+
+/* Panels in a row have no bottom margin */
+.panels-row .collapsible-panel {
+  margin-bottom: 0;
+}
+
+.panel-header {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.panel-header-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.25rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text);
+  transition: background-color 0.15s ease;
+}
+
+.panel-header-btn:hover {
+  background: var(--color-bg);
+}
+
+.panel-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.panel-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.panel-badge {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--color-tertiary);
+  background: var(--color-bg);
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+}
+
+.collapse-icon {
+  color: var(--color-secondary);
+  transition: transform 0.2s ease;
+}
+
+.collapse-icon.expanded {
+  transform: rotate(180deg);
+}
+
+/* Panel action button slot */
+.panel-action-slot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-right: 0.75rem;
+}
+
+.panel-action-slot .panel-action-btn {
+  position: static;
+}
+
+.panel-action-slot .panel-action-btn.active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: white;
+}
+
+.panel-action-slot .panel-action-btn.active:hover {
+  background: #0066d6;
+}
+
+/* Panel body - content area with scrollbar at right edge */
+.panel-body {
+  border-top: 1px solid var(--color-border);
+  max-height: 35vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--panel-padding);
+  /* Firefox scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+/* Webkit scrollbar - flush with panel edge */
+.panel-body::-webkit-scrollbar {
+  width: 10px;
+}
+
+.panel-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.panel-body::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 5px;
+  border: 2px solid var(--color-surface);
+}
+
+.panel-body::-webkit-scrollbar-thumb:hover {
+  background: var(--color-secondary);
+}
+
+/* Expanded state border */
+.collapsible-panel.expanded .panel-header-btn {
+  border-bottom-left-radius: 0;
+}
+
+/* Override child component borders when inside panel */
+.collapsible-panel .space-editor {
+  border: none;
+  border-radius: 0;
+  margin-bottom: 0;
+  background: transparent;
+}
+
+.collapsible-panel .space-editor .space-editor-content {
+  padding: 0;
+  padding-right: 0;
+}
+
+.collapsible-panel .romanization-panel {
+  border: none;
+  border-radius: 0;
+  margin-bottom: 0;
+  background: transparent;
+}
+
+.collapsible-panel .romanization-panel .panel-content {
+  padding: 0;
+}
+
