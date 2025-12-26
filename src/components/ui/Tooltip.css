@@ -5,7 +5,7 @@
   background: var(--color-text);
   color: var(--color-bg);
   border-radius: 10px;
-  z-index: 100000;
+  z-index: var(--z-tooltip);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   animation: portalTooltipFadeIn 0.12s ease-out;
   pointer-events: none;
@@ -131,6 +131,11 @@
   font-style: italic;
 }
 
+.portal-tooltip .column-value.english.user-defined {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
 .portal-tooltip .column-value.no-translation {
   color: rgba(255, 255, 255, 0.4);
   font-style: italic;
@@ -207,6 +212,11 @@
 .portal-tooltip .word-meaning {
   color: rgba(255, 255, 255, 0.7);
   font-style: italic;
+}
+
+.portal-tooltip .word-meaning.user-defined {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
 }
 
 /* Cluster-only variant */

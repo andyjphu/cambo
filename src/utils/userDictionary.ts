@@ -7,8 +7,8 @@
  */
 
 import { type DictionaryEntry } from './dictionaryCore';
-
-const STORAGE_KEY = 'cambo-user-dictionary';
+import { STORAGE_KEYS } from '../constants/storageKeys';
+import { getStorageItem, setStorageItem, removeStorageItem } from './storage';
 
 export interface UserDictionaryEntry extends DictionaryEntry {
   createdAt: string;
@@ -19,26 +19,14 @@ export interface UserDictionaryEntry extends DictionaryEntry {
  * Load user dictionary from localStorage
  */
 export function getUserDictionary(): UserDictionaryEntry[] {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  } catch (e) {
-    console.warn('Failed to load user dictionary:', e);
-  }
-  return [];
+  return getStorageItem(STORAGE_KEYS.USER_DICTIONARY, []);
 }
 
 /**
  * Save user dictionary to localStorage
  */
 function saveUserDictionary(entries: UserDictionaryEntry[]): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-  } catch (e) {
-    console.error('Failed to save user dictionary:', e);
-  }
+  setStorageItem(STORAGE_KEYS.USER_DICTIONARY, entries);
 }
 
 /**
@@ -178,7 +166,7 @@ export function getUserDictionaryCount(): number {
  * Clear all user dictionary entries
  */
 export function clearUserDictionary(): void {
-  localStorage.removeItem(STORAGE_KEY);
+  removeStorageItem(STORAGE_KEYS.USER_DICTIONARY);
 }
 
 /**

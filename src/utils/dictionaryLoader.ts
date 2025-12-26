@@ -46,7 +46,7 @@ export async function loadExtendedDictionary(): Promise<DictionaryEntry[]> {
 
       const data: DictionaryEntry[] = await response.json();
       extendedDictionary = data;
-      console.log(`Loaded ${data.length} extended dictionary entries`);
+      // Extended dictionary loaded successfully
       return data;
     } catch (error) {
       console.error('Failed to load extended dictionary:', error);
@@ -174,7 +174,7 @@ export async function loadWordList(): Promise<Set<string>> {
 
       const words: string[] = await response.json();
       wordListSet = new Set(words);
-      console.log(`Loaded ${words.length} words for segmentation`);
+      // Word list loaded successfully
       return wordListSet;
     } catch (error) {
       console.error('Failed to load word list:', error);

@@ -16,6 +16,7 @@
 import { coreDictionary, lookupKhmer, type DictionaryEntry } from './dictionaryCore';
 import { getUserDictionary, lookupUserWord } from './userDictionary';
 import { parseKhmerText, type KhmerCluster } from './khmerParser';
+import { convertKhmerNumber } from './alaLcRomanization';
 
 export interface SegmentedWord {
   text: string;
@@ -68,10 +69,34 @@ export function refreshDictionary(): void {
 }
 
 /**
+ * Check if a string is a Khmer number (all numerals)
+ */
+function isKhmerNumber(text: string): boolean {
+  if (!text || text.length === 0) return false;
+  
+  // Khmer numerals: U+17E0 - U+17E9 (០-៩)
+  const khmerNumeralRange = /^[\u17E0-\u17E9]+$/;
+  return khmerNumeralRange.test(text);
+}
+
+/**
  * Get dictionary entry for a word
  * User dictionary takes precedence over core dictionary
+ * Numbers are handled specially - they return a synthetic entry
  */
 export function getDictionaryEntry(word: string): DictionaryEntry | null {
+  // Handle numbers specially
+  if (isKhmerNumber(word)) {
+    const latinNumber = convertKhmerNumber(word);
+    return {
+      khmer: word,
+      english: latinNumber,
+      romanized: latinNumber,
+      phonetic: latinNumber,
+      pos: 'num',
+    };
+  }
+  
   // User dictionary takes precedence
   const userEntry = lookupUserWord(word);
   if (userEntry) return userEntry;
@@ -92,9 +117,16 @@ export function isUserDefinedWord(word: string): boolean {
 
 /**
  * Check if a word exists in our dictionary
+ * Numbers (Khmer numerals) are always considered known words
  */
 export function isKnownWord(word: string): boolean {
   initDictionary();
+  
+  // Numbers are always considered valid words
+  if (isKhmerNumber(word)) {
+    return true;
+  }
+  
   return dictionaryWords?.has(word) || false;
 }
 
@@ -111,7 +143,9 @@ function clustersToText(clusters: KhmerCluster[], start: number, end: number): s
  * Greedily matches the longest word from the start, respecting cluster boundaries
  * This ensures vowels/diacritics are never separated from their consonants
  */
-function forwardMaxMatch(clusters: KhmerCluster[], maxClusters: number = 8): SegmentedWord[] {
+import { SEGMENTATION_CONSTANTS } from '../constants/segmentation';
+
+function forwardMaxMatch(clusters: KhmerCluster[], maxClusters: number = SEGMENTATION_CONSTANTS.MAX_WORD_CLUSTERS): SegmentedWord[] {
   initDictionary();
   const results: SegmentedWord[] = [];
   let pos = 0;
@@ -215,7 +249,7 @@ function forwardMaxMatch(clusters: KhmerCluster[], maxClusters: number = 8): Seg
  * Backward Maximum Matching (Cluster-based)
  * Greedily matches the longest word from the end, respecting cluster boundaries
  */
-function backwardMaxMatch(clusters: KhmerCluster[], maxClusters: number = 8): SegmentedWord[] {
+function backwardMaxMatch(clusters: KhmerCluster[], maxClusters: number = SEGMENTATION_CONSTANTS.MAX_WORD_CLUSTERS): SegmentedWord[] {
   initDictionary();
   const results: SegmentedWord[] = [];
 
@@ -418,7 +452,6 @@ export async function segmentTextWithLLM(
 ): Promise<SegmentationResult> {
   // TODO: Implement LLM-based segmentation
   // For now, fall back to dictionary-based
-  console.log('[segmentTextWithLLM] LLM segmentation not yet implemented, using dictionary fallback');
   return segmentText(text);
 }
 

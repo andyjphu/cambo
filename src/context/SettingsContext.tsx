@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { khmerFonts, loadFont, type KhmerFont } from '../utils/fonts';
+import { STORAGE_KEYS } from '../constants/storageKeys';
+import { getStorageItem, setStorageItem } from '../utils/storage';
 
 export type PronunciationMode = 'ipa' | 'phonetic';
 
@@ -18,8 +20,6 @@ interface SettingsContextType {
   setShowRomanizationPanel: (show: boolean) => void;
 }
 
-const STORAGE_KEY = 'cambo-settings';
-
 const defaultFont = khmerFonts.find(f => f.name === 'Noto Sans Khmer') || khmerFonts[0];
 
 const defaultSettings: Settings = {
@@ -29,39 +29,38 @@ const defaultSettings: Settings = {
   showRomanizationPanel: true,    // Romanization panel on by default
 };
 
+interface StoredSettings {
+  selectedFontName: string;
+  pronunciationMode: PronunciationMode;
+  showHoverTooltips: boolean;
+  showRomanizationPanel: boolean;
+}
+
 // Load settings from localStorage
 function loadSettings(): Settings {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      // Restore font from stored name
-      const font = khmerFonts.find(f => f.name === parsed.selectedFontName) || defaultFont;
-      return {
-        selectedFont: font,
-        pronunciationMode: parsed.pronunciationMode || defaultSettings.pronunciationMode,
-        showHoverTooltips: parsed.showHoverTooltips ?? defaultSettings.showHoverTooltips,
-        showRomanizationPanel: parsed.showRomanizationPanel ?? defaultSettings.showRomanizationPanel,
-      };
-    }
-  } catch (e) {
-    console.warn('Failed to load settings from localStorage:', e);
+  const stored = getStorageItem<StoredSettings | null>(STORAGE_KEYS.SETTINGS, null);
+  if (stored) {
+    // Restore font from stored name
+    const font = khmerFonts.find(f => f.name === stored.selectedFontName) || defaultFont;
+    return {
+      selectedFont: font,
+      pronunciationMode: stored.pronunciationMode || defaultSettings.pronunciationMode,
+      showHoverTooltips: stored.showHoverTooltips ?? defaultSettings.showHoverTooltips,
+      showRomanizationPanel: stored.showRomanizationPanel ?? defaultSettings.showRomanizationPanel,
+    };
   }
   return defaultSettings;
 }
 
 // Save settings to localStorage
 function saveSettings(settings: Settings) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      selectedFontName: settings.selectedFont.name,
-      pronunciationMode: settings.pronunciationMode,
-      showHoverTooltips: settings.showHoverTooltips,
-      showRomanizationPanel: settings.showRomanizationPanel,
-    }));
-  } catch (e) {
-    console.warn('Failed to save settings to localStorage:', e);
-  }
+  const stored: StoredSettings = {
+    selectedFontName: settings.selectedFont.name,
+    pronunciationMode: settings.pronunciationMode,
+    showHoverTooltips: settings.showHoverTooltips,
+    showRomanizationPanel: settings.showRomanizationPanel,
+  };
+  setStorageItem(STORAGE_KEYS.SETTINGS, stored);
 }
 
 const SettingsContext = createContext<SettingsContextType | null>(null);
@@ -73,8 +72,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const font = settings.selectedFont;
     if (font && font.googleFont) {
-      loadFont(font).catch(err => {
-        console.warn('Failed to load font on startup:', err);
+      loadFont(font).catch(() => {
+        // Font loading failure is handled silently - fallback fonts will be used
       });
     }
   }, [settings.selectedFont]);

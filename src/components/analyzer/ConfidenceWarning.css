@@ -35,7 +35,7 @@
 .warning-tooltip-portal {
   position: fixed;
   transform: translateX(-50%);
-  z-index: 100000;
+  z-index: var(--z-tooltip);
   pointer-events: none;
   animation: warningTooltipFadeIn 0.15s ease;
 }

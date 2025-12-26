@@ -60,6 +60,11 @@
   margin-left: 0.25rem;
 }
 
+.rom-english.user-defined {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
 .rom-item:not(:last-child)::after {
   content: "-";
   color: var(--color-border);

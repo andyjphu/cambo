@@ -141,11 +141,57 @@ export interface RomanizationResult {
 /**
  * Romanize a Khmer cluster (syllable) using ALA-LC rules
  */
+/**
+ * Convert Khmer numerals to Latin numerals
+ * Khmer: ០ ១ ២ ៣ ៤ ៥ ៦ ៧ ៨ ៩
+ * Latin: 0 1 2 3 4 5 6 7 8 9
+ */
+export function khmerToLatinNumeral(khmerNum: string): string {
+  const khmerToLatin: Record<string, string> = {
+    '០': '0',
+    '១': '1',
+    '២': '2',
+    '៣': '3',
+    '៤': '4',
+    '៥': '5',
+    '៦': '6',
+    '៧': '7',
+    '៨': '8',
+    '៩': '9',
+  };
+  
+  return khmerNum
+    .split('')
+    .map(char => khmerToLatin[char] || char)
+    .join('');
+}
+
+/**
+ * Convert a Khmer numeral cluster to its Latin equivalent
+ */
+export function convertKhmerNumber(clusterText: string): string {
+  return khmerToLatinNumeral(clusterText);
+}
+
 export function romanizeCluster(components: KhmerComponent[]): RomanizationResult {
   const warnings: string[] = [];
   let romanized = '';
   let phonetic = '';
   let confidence: 'high' | 'medium' | 'low' = 'high';
+
+  // Check if this is a numeral cluster
+  if (components.length > 0 && components[0].type === 'numeral') {
+    // All components should be numerals (they're grouped together)
+    const khmerNumber = components.map(c => c.char).join('');
+    const latinNumber = convertKhmerNumber(khmerNumber);
+    
+    return {
+      romanized: latinNumber,
+      phonetic: latinNumber,
+      confidence: 'high',
+      warnings: [],
+    };
+  }
 
   // Find the base consonant and determine series
   let baseSeries: 1 | 2 = 1;

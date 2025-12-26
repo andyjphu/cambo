@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { BsPlusCircle, BsBook, BsSearch, BsX, BsDownload, BsUpload, BsTrash } from 'react-icons/bs';
 import { useSettings } from '../context/SettingsContext';
 import { coreDictionary } from '../utils/dictionaryCore';
 import { 
@@ -116,10 +117,7 @@ export function DictionaryPage() {
           className={`dict-tab ${activeTab === 'user' ? 'active' : ''}`}
           onClick={() => setActiveTab('user')}
         >
-          <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-            <path d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"/>
-            <path d="M8 4a.75.75 0 01.75.75v2.5h2.5a.75.75 0 010 1.5h-2.5v2.5a.75.75 0 01-1.5 0v-2.5h-2.5a.75.75 0 010-1.5h2.5v-2.5A.75.75 0 018 4z"/>
-          </svg>
+          <BsPlusCircle size={14} />
           My Words
           <span className="tab-count">{userDictionary.length}</span>
         </button>
@@ -127,9 +125,7 @@ export function DictionaryPage() {
           className={`dict-tab ${activeTab === 'core' ? 'active' : ''}`}
           onClick={() => setActiveTab('core')}
         >
-          <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-            <path d="M0 1.75A.75.75 0 01.75 1h4.253c1.227 0 2.317.59 3 1.501A3.744 3.744 0 0111.006 1h4.245a.75.75 0 01.75.75v10.5a.75.75 0 01-.75.75h-4.507a2.25 2.25 0 00-1.591.659l-.622.621a.75.75 0 01-1.06 0l-.622-.621A2.25 2.25 0 005.258 13H.75a.75.75 0 01-.75-.75V1.75zm7.251 10.324l.004-5.073-.002-2.253A2.25 2.25 0 005.003 2.5H1.5v9h3.757a3.75 3.75 0 011.994.574zM8.755 4.75l-.004 7.322a3.752 3.752 0 011.992-.572H14.5v-9h-3.495a2.25 2.25 0 00-2.25 2.25z"/>
-          </svg>
+          <BsBook size={14} />
           Core Dictionary
           <span className="tab-count">{coreDictionary.length}</span>
         </button>
@@ -137,9 +133,7 @@ export function DictionaryPage() {
 
       {/* Search */}
       <div className="dictionary-search">
-        <svg className="search-icon" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M10.68 11.74a6 6 0 111.06-1.06l3.04 3.04a.75.75 0 01-1.06 1.06l-3.04-3.04zM11 6.5a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/>
-        </svg>
+        <BsSearch className="search-icon" size={16} />
         <input
           type="text"
           className="search-input"
@@ -149,9 +143,7 @@ export function DictionaryPage() {
         />
         {searchQuery && (
           <button className="search-clear" onClick={() => setSearchQuery('')}>
-            <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-              <path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/>
-            </svg>
+            <BsX size={14} />
           </button>
         )}
       </div>
@@ -160,31 +152,20 @@ export function DictionaryPage() {
       {activeTab === 'user' && (
         <div className="dictionary-actions">
           <button className="action-btn" onClick={() => handleExport('json')}>
-            <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-              <path d="M2.75 14A1.75 1.75 0 011 12.25v-2.5a.75.75 0 011.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 00.25-.25v-2.5a.75.75 0 011.5 0v2.5A1.75 1.75 0 0113.25 14H2.75z"/>
-              <path d="M7.25 7.689V2a.75.75 0 011.5 0v5.689l1.97-1.969a.749.749 0 111.06 1.06l-3.25 3.25a.749.749 0 01-1.06 0L4.22 6.78a.749.749 0 111.06-1.06l1.97 1.969z"/>
-            </svg>
+            <BsDownload size={14} />
             Export JSON
           </button>
           <button className="action-btn" onClick={() => handleExport('csv')}>
-            <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-              <path d="M2.75 14A1.75 1.75 0 011 12.25v-2.5a.75.75 0 011.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 00.25-.25v-2.5a.75.75 0 011.5 0v2.5A1.75 1.75 0 0113.25 14H2.75z"/>
-              <path d="M7.25 7.689V2a.75.75 0 011.5 0v5.689l1.97-1.969a.749.749 0 111.06 1.06l-3.25 3.25a.749.749 0 01-1.06 0L4.22 6.78a.749.749 0 111.06-1.06l1.97 1.969z"/>
-            </svg>
+            <BsDownload size={14} />
             Export CSV
           </button>
           <button className="action-btn" onClick={() => setShowImportModal(true)}>
-            <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-              <path d="M2.75 14A1.75 1.75 0 011 12.25v-2.5a.75.75 0 011.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 00.25-.25v-2.5a.75.75 0 011.5 0v2.5A1.75 1.75 0 0113.25 14H2.75z"/>
-              <path d="M11.78 4.72a.749.749 0 10-1.06-1.06L8.75 5.629V.75a.75.75 0 00-1.5 0v4.879L5.28 3.66a.749.749 0 10-1.06 1.06l3.25 3.25a.749.749 0 001.06 0l3.25-3.25z"/>
-            </svg>
+            <BsUpload size={14} />
             Import
           </button>
           {userDictionary.length > 0 && (
             <button className="action-btn danger" onClick={() => setShowClearConfirm(true)}>
-              <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                <path d="M11 1.75V3h2.25a.75.75 0 010 1.5H2.75a.75.75 0 010-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75zM4.496 6.675l.66 6.6a.25.25 0 00.249.225h5.19a.25.25 0 00.249-.225l.66-6.6a.75.75 0 011.492.149l-.66 6.6A1.748 1.748 0 0110.595 15h-5.19a1.75 1.75 0 01-1.741-1.575l-.66-6.6a.75.75 0 111.492-.15zM6.5 1.75V3h3V1.75a.25.25 0 00-.25-.25h-2.5a.25.25 0 00-.25.25z"/>
-              </svg>
+              <BsTrash size={14} />
               Clear All
             </button>
           )}
@@ -221,9 +202,7 @@ export function DictionaryPage() {
                       onClick={() => handleDeleteWord(entry.khmer)}
                       title="Delete word"
                     >
-                      <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                        <path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/>
-                      </svg>
+                      <BsX size={14} />
                     </button>
                   </div>
                 </div>
@@ -231,10 +210,7 @@ export function DictionaryPage() {
             </div>
           ) : (
             <div className="empty-state">
-              <svg viewBox="0 0 16 16" fill="currentColor" width="48" height="48">
-                <path d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"/>
-                <path d="M8 4a.75.75 0 01.75.75v2.5h2.5a.75.75 0 010 1.5h-2.5v2.5a.75.75 0 01-1.5 0v-2.5h-2.5a.75.75 0 010-1.5h2.5v-2.5A.75.75 0 018 4z"/>
-              </svg>
+              <BsPlusCircle size={48} />
               <h3>No custom words yet</h3>
               <p>Add words from the Analyze page using selection mode</p>
             </div>

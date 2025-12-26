@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { type KhmerCluster } from '../../utils/khmerParser';
 import { romanizeCluster } from '../../utils/alaLcRomanization';
-import { getDictionaryEntry } from '../../utils/wordSegmentation';
+import { getDictionaryEntry, isUserDefinedWord } from '../../utils/wordSegmentation';
 import { getSyllableColor } from '../../utils/colors';
 import { ConfidenceWarning } from './ConfidenceWarning';
 import './RomanizationPanel.css';
@@ -57,10 +57,12 @@ export function RomanizationPanel({
       // Check dictionary first (user dictionary takes precedence)
       const dictEntry = getDictionaryEntry(cluster.text);
       if (dictEntry) {
+        // For user-defined words, prioritize romanized field
+        // For display: show romanized (or phonetic) in main display, english in parentheses
         result.push({
           khmer: cluster.text,
           romanized: dictEntry.romanized || dictEntry.phonetic || '',
-          phonetic: dictEntry.phonetic || '',
+          phonetic: dictEntry.phonetic || dictEntry.romanized || '',
           english: dictEntry.english,
           confidence: 'high',
           warnings: [],
@@ -127,7 +129,9 @@ export function RomanizationPanel({
                 />
               </span>
               {item.english && (
-                <span className="rom-english">({item.english})</span>
+                <span className={`rom-english ${isUserDefinedWord(item.khmer) ? 'user-defined' : ''}`}>
+                  ({item.english})
+                </span>
               )}
             </span>
           );

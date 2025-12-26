@@ -89,7 +89,7 @@
 /* Panel body - content area with scrollbar at right edge */
 .panel-body {
   border-top: 1px solid var(--color-border);
-  max-height: 35vh;
+  max-height: var(--panel-max-height);
   overflow-y: auto;
   overflow-x: hidden;
   padding: var(--panel-padding);

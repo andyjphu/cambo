@@ -249,6 +249,19 @@ export const coreDictionary: DictionaryEntry[] = [
   { khmer: 'លឿង', english: 'yellow', pos: 'adj', romanized: 'lœă-ngô', phonetic: 'LEUA-NGO', frequency: 70 },
   { khmer: 'បៃតង', english: 'green', pos: 'adj', romanized: 'bai-tngô', phonetic: 'BAI-TNGO', frequency: 70 },
   { khmer: 'ខៀវ', english: 'blue', pos: 'adj', romanized: 'khiĕ-vô', phonetic: 'KHIA-VO', frequency: 70 },
+  // Gregorian months
+  { khmer: 'មករា', english: 'January', pos: 'noun', romanized: 'môk-kâ-raa', phonetic: 'MOK-KA-RA', frequency: 85 },
+  { khmer: 'កុម្ភៈ', english: 'February', pos: 'noun', romanized: 'kom-phéak', phonetic: 'KOM-PHEAK', frequency: 85 },
+  { khmer: 'មីនា', english: 'March', pos: 'noun', romanized: 'mī-nā', phonetic: 'MEE-NA', frequency: 85 },
+  { khmer: 'មេសា', english: 'April', pos: 'noun', romanized: 'mé-sā', phonetic: 'MAY-SA', frequency: 85 },
+  { khmer: 'ឧសភា', english: 'May', pos: 'noun', romanized: '\'o-sa-phi-a', phonetic: 'O-SA-PHI-A', frequency: 85 },
+  { khmer: 'មិថុនា', english: 'June', pos: 'noun', romanized: 'mĭ-tho-nā', phonetic: 'MI-THO-NA', frequency: 85 },
+  { khmer: 'កក្កដា', english: 'July', pos: 'noun', romanized: 'kak-ka-dā', phonetic: 'KAK-KA-DA', frequency: 85 },
+  { khmer: 'សីហា', english: 'August', pos: 'noun', romanized: 'sei-hā', phonetic: 'SEI-HA', frequency: 85 },
+  { khmer: 'កញ្ញា', english: 'September', pos: 'noun', romanized: 'kan-nhā', phonetic: 'KAN-NHA', frequency: 85 },
+  { khmer: 'តុលា', english: 'October', pos: 'noun', romanized: 'to-lā', phonetic: 'TO-LA', frequency: 85 },
+  { khmer: 'វិច្ឆិកា', english: 'November', pos: 'noun', romanized: 'vĭt-chhĭ-kā', phonetic: 'VIT-CHHI-KA', frequency: 85 },
+  { khmer: 'ធ្នូ', english: 'December', pos: 'noun', romanized: 'thnou', phonetic: 'THNOU', frequency: 85 },
 ];
 
 // Build lookup maps for efficient access

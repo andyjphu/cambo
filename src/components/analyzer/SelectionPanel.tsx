@@ -20,6 +20,7 @@ import {
 import { refreshDictionary } from '../../utils/wordSegmentation';
 import { parseKhmerText } from '../../utils/khmerParser';
 import { romanizeCluster } from '../../utils/alaLcRomanization';
+import { BsX, BsClipboard, BsCheckCircle, BsDownload } from 'react-icons/bs';
 import './SelectionPanel.css';
 
 interface SelectionPanelProps {
@@ -138,9 +139,7 @@ export function SelectionPanel({ selectedText, isOpen, onClose, onWordAdded }: S
       <div className="selection-panel-header">
         <h3>Selection Tools</h3>
         <button className="close-btn" onClick={onClose} title="Close">
-          <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-            <path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/>
-          </svg>
+          <BsX size={14} />
         </button>
       </div>
 
@@ -189,10 +188,7 @@ export function SelectionPanel({ selectedText, isOpen, onClose, onWordAdded }: S
               onClick={handleCopyText}
               disabled={!selectedText}
             >
-              <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/>
-                <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/>
-              </svg>
+              <BsClipboard size={14} />
               Copy to Clipboard
             </button>
             {copied && <div className="copy-feedback">Copied!</div>}
@@ -248,9 +244,7 @@ export function SelectionPanel({ selectedText, isOpen, onClose, onWordAdded }: S
               onClick={handleSaveWord}
               disabled={!selectedText.trim() || !english.trim()}
             >
-              <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm9.78-2.22-4.78 4.78-1.78-1.78a.75.75 0 0 0-1.06 1.06l2.25 2.25c.141.14.331.22.53.22a.75.75 0 0 0 .53-.22l5.25-5.25a.75.75 0 0 0-1.06-1.06Z"/>
-              </svg>
+              <BsCheckCircle size={14} />
               Save to Dictionary
             </button>
             {saveSuccess && <div className="save-feedback">Saved!</div>}
@@ -268,10 +262,7 @@ export function SelectionPanel({ selectedText, isOpen, onClose, onWordAdded }: S
                 onClick={handleExportJSON}
                 disabled={dictCount === 0}
               >
-                <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                  <path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14Z"/>
-                  <path d="M7.25 7.689V2a.75.75 0 0 1 1.5 0v5.689l1.97-1.969a.749.749 0 1 1 1.06 1.06l-3.25 3.25a.749.749 0 0 1-1.06 0L4.22 6.78a.749.749 0 1 1 1.06-1.06l1.97 1.969Z"/>
-                </svg>
+                <BsDownload size={14} />
                 Export JSON
               </button>
               <button 
@@ -279,10 +270,7 @@ export function SelectionPanel({ selectedText, isOpen, onClose, onWordAdded }: S
                 onClick={handleExportCSV}
                 disabled={dictCount === 0}
               >
-                <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                  <path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14Z"/>
-                  <path d="M7.25 7.689V2a.75.75 0 0 1 1.5 0v5.689l1.97-1.969a.749.749 0 1 1 1.06 1.06l-3.25 3.25a.749.749 0 0 1-1.06 0L4.22 6.78a.749.749 0 1 1 1.06-1.06l1.97 1.969Z"/>
-                </svg>
+                <BsDownload size={14} />
                 Export CSV
               </button>
             </div>

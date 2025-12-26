@@ -36,14 +36,42 @@
   /* Spacing */
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
-  --space-md: 1rem;
-  --space-lg: 1.5rem;
-  --space-xl: 2rem;
-  --space-2xl: 3rem;
+  --space-md: 0.75rem;   /* Most common spacing */
+  --space-lg: 1rem;
+  --space-xl: 1.25rem;   /* Panel padding */
+  --space-2xl: 1.5rem;
+  --space-3xl: 2rem;
+  --space-4xl: 3rem;
 
   /* Panel Styling - Standardized */
-  --panel-padding: 1.25rem;
+  --panel-padding: var(--space-xl);
+  --panel-max-height: 35vh;
   --panel-radius: 12px;
+
+  /* Icon Sizes */
+  --icon-size-sm: 14px;
+  --icon-size-md: 16px;
+  --icon-size-lg: 20px;
+
+  /* Button Sizes */
+  --button-size-sm: 24px;
+  --button-size-md: 28px;
+  --button-size-lg: 32px;
+
+  /* Text Sizes */
+  --text-xs: 0.625rem;   /* 10px */
+  --text-sm: 0.75rem;    /* 12px - most common */
+  --text-base: 0.875rem; /* 14px */
+  --text-md: 1rem;       /* 16px */
+  --text-lg: 1.25rem;    /* 20px */
+
+  /* Z-Index Layers */
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 1000;
+  --z-tooltip: 10000;    /* Portal-based tooltips */
+  --z-portal: 10000;     /* Portal-based components */
 
   /* Radii */
   --radius-sm: 6px;

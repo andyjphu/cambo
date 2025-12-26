@@ -10,38 +10,13 @@ import { RomanizationPanel } from '../components/analyzer/RomanizationPanel';
 import { ConfidenceWarning } from '../components/analyzer/ConfidenceWarning';
 import { SpaceEditor } from '../components/analyzer/SpaceEditor';
 import { SelectionPanel } from '../components/analyzer/SelectionPanel';
-import { BsArrowsAngleContract } from 'react-icons/bs';
+import { BsArrowsAngleContract, BsCheck, BsPencil, BsCheckSquare, BsSquare, BsPlusCircle } from 'react-icons/bs';
+import { TYPE_LABELS, POS_LABELS } from '../constants/khmerTypes';
+import { STORAGE_KEYS } from '../constants/storageKeys';
+import { DISPLAY_CONSTANTS } from '../constants/display';
+import { getStorageItem, setStorageItem } from '../utils/storage';
 import './AnalyzePage.css';
 
-const TYPE_LABELS: Record<KhmerCharType, string> = {
-  consonant: 'Consonant',
-  subscript: 'Subscript',
-  vowel: 'Vowel',
-  indep_vowel: 'Ind. Vowel',
-  sign: 'Sign',
-  numeral: 'Number',
-  punctuation: 'Punct.',
-  coeng: 'Coeng',
-  space: 'Space',
-  other: 'Other',
-};
-
-// Part of speech labels - full names for user display
-const POS_LABELS: Record<string, string> = {
-  noun: 'noun',
-  verb: 'verb',
-  adj: 'adjective',
-  adv: 'adverb',
-  pron: 'pronoun',
-  prep: 'preposition',
-  conj: 'conjunction',
-  part: 'particle',
-  num: 'number',
-};
-
-const INPUT_TEXT_STORAGE_KEY = 'cambo-input-text';
-const PANEL_STATE_STORAGE_KEY = 'cambo-panel-states';
-const DEFAULT_INPUT_TEXT = 'សួស្តី ខ្ញុំ ស្រឡាញ់ កម្ពុជា';
 
 interface PanelStates {
   khmerText: boolean;
@@ -60,24 +35,11 @@ const DEFAULT_PANEL_STATES: PanelStates = {
 };
 
 function loadInputText(): string {
-  try {
-    const saved = localStorage.getItem(INPUT_TEXT_STORAGE_KEY);
-    return saved ?? DEFAULT_INPUT_TEXT;
-  } catch {
-    return DEFAULT_INPUT_TEXT;
-  }
+  return getStorageItem(STORAGE_KEYS.INPUT_TEXT, DISPLAY_CONSTANTS.DEFAULT_INPUT_TEXT);
 }
 
 function loadPanelStates(): PanelStates {
-  try {
-    const saved = localStorage.getItem(PANEL_STATE_STORAGE_KEY);
-    if (saved) {
-      return { ...DEFAULT_PANEL_STATES, ...JSON.parse(saved) };
-    }
-    return DEFAULT_PANEL_STATES;
-  } catch {
-    return DEFAULT_PANEL_STATES;
-  }
+  return getStorageItem(STORAGE_KEYS.PANEL_STATES, DEFAULT_PANEL_STATES);
 }
 
 export function AnalyzePage() {
@@ -90,20 +52,12 @@ export function AnalyzePage() {
 
   // Persist input text to localStorage
   useEffect(() => {
-    try {
-      localStorage.setItem(INPUT_TEXT_STORAGE_KEY, inputText);
-    } catch (e) {
-      console.warn('Failed to save input text:', e);
-    }
+    setStorageItem(STORAGE_KEYS.INPUT_TEXT, inputText);
   }, [inputText]);
 
   // Persist panel states to localStorage
   useEffect(() => {
-    try {
-      localStorage.setItem(PANEL_STATE_STORAGE_KEY, JSON.stringify(panelStates));
-    } catch (e) {
-      console.warn('Failed to save panel states:', e);
-    }
+    setStorageItem(STORAGE_KEYS.PANEL_STATES, panelStates);
   }, [panelStates]);
 
   const togglePanel = useCallback((panel: keyof PanelStates) => {
@@ -186,10 +140,15 @@ export function AnalyzePage() {
     });
   }, [showSelectionPanel]);
 
+  // Dictionary version state to force re-computation when dictionary changes
+  const [dictionaryVersion, setDictionaryVersion] = useState(0);
+
   // Handle word added callback
   const handleWordAdded = useCallback(() => {
     // Refresh dictionary after adding a word
     refreshDictionary();
+    // Increment version to force re-computation of memoized values
+    setDictionaryVersion(prev => prev + 1);
   }, []);
 
   // Get non-space cluster indices for consistent coloring
@@ -312,7 +271,7 @@ export function AnalyzePage() {
     }
 
     return result;
-  }, [clusters]);
+  }, [clusters, dictionaryVersion]); // Include dictionaryVersion to refresh when dictionary changes
 
   const khmerFontStyle = { fontFamily: `'${settings.selectedFont.family}', 'Noto Sans Khmer', sans-serif` };
   const showIPA = settings.pronunciationMode === 'ipa';
@@ -332,7 +291,7 @@ export function AnalyzePage() {
   }, []);
 
   const getClusterInfo = useCallback((cluster: KhmerCluster) => {
-    // Check dictionary first
+    // Check dictionary first (user dictionary takes precedence)
     const dictEntry = getDictionaryEntry(cluster.text);
     if (dictEntry) {
       return {
@@ -342,6 +301,7 @@ export function AnalyzePage() {
         confidence: 'high' as const,
         warnings: [],
         fromDictionary: true,
+        isUserDefined: isUserDefinedWord(cluster.text),
       };
     }
 
@@ -354,6 +314,7 @@ export function AnalyzePage() {
       confidence: rom.confidence,
       warnings: rom.warnings,
       fromDictionary: false,
+      isUserDefined: false,
     };
   }, []);
 
@@ -394,7 +355,7 @@ export function AnalyzePage() {
       compInfo,
       isClusterOnly: activeCompIdx === null,
     };
-  }, [activeClusterIdx, activeCompIdx, clusters, getNonSpaceIdx, getClusterInfo, words, getComponentInfo, settings.showHoverTooltips]);
+  }, [activeClusterIdx, activeCompIdx, clusters, getNonSpaceIdx, getClusterInfo, words, getComponentInfo, settings.showHoverTooltips, dictionaryVersion]); // Include dictionaryVersion
 
   return (
     <div className="analyze-page">
@@ -427,9 +388,7 @@ export function AnalyzePage() {
                   title="Confirm and auto-segment text"
                   disabled={!inputText.trim()}
                 >
-                  <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
-                  </svg>
+                  <BsCheck size={14} />
                 </button>
               ) : (
                 <button
@@ -437,9 +396,7 @@ export function AnalyzePage() {
                   onClick={() => setIsEditMode(true)}
                   title="Edit text"
                 >
-                  <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                    <path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Z" />
-                  </svg>
+                  <BsPencil size={14} />
                 </button>
               )}
             </>
@@ -452,7 +409,7 @@ export function AnalyzePage() {
               style={khmerFontStyle}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="សូមសរសេរភាសាខ្មែរនៅទីនេះ..."
+              placeholder={DISPLAY_CONSTANTS.PLACEHOLDER_TEXT}
               rows={3}
             />
           ) : (
@@ -491,7 +448,7 @@ export function AnalyzePage() {
                   );
                 })
               ) : (
-                <span className="placeholder">Click edit to add text...</span>
+                <span className="placeholder">{DISPLAY_CONSTANTS.PLACEHOLDER_EMPTY}</span>
               )}
             </div>
           )}
@@ -526,14 +483,9 @@ export function AnalyzePage() {
                   title={isSelectionMode ? 'Exit selection mode' : 'Select syllables to copy or add to dictionary'}
                 >
                   {isSelectionMode ? (
-                    <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                      <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
-                    </svg>
+                    <BsCheckSquare size={14} />
                   ) : (
-                    <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                      <path d="M5.75 7.5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Zm5.25.75a.75.75 0 0 0-1.5 0v1.5a.75.75 0 0 0 1.5 0v-1.5Z" />
-                      <path d="M6.25 0a.75.75 0 0 0 0 1.5H7.5v2H3.75A1.75 1.75 0 0 0 2 5.25v.5a.75.75 0 0 0 1.5 0v-.5a.25.25 0 0 1 .25-.25H7.5v3.5H5.75a.75.75 0 0 0 0 1.5H7.5v.5c0 .69.28 1.315.732 1.768l1.5 1.5a.75.75 0 0 0 1.06-1.06l-1.5-1.5A.25.25 0 0 1 9 10.5V10h2.25a.75.75 0 0 0 0-1.5H9V5h3.25a.25.25 0 0 1 .25.25v.5a.75.75 0 0 0 1.5 0v-.5A1.75 1.75 0 0 0 12.25 3.5H9v-2h1.25a.75.75 0 0 0 0-1.5h-4Z" />
-                    </svg>
+                    <BsSquare size={14} />
                   )}
                 </button>
               </>
@@ -653,9 +605,7 @@ export function AnalyzePage() {
                   }}
                   title="Edit word boundaries"
                 >
-                  <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                    <path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Z" />
-                  </svg>
+                  <BsPencil size={14} />
                 </button>
               ) : isEditingBoundaries ? (
                 <button
@@ -666,9 +616,7 @@ export function AnalyzePage() {
                   }}
                   title="Done editing boundaries"
                 >
-                  <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
-                    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" />
-                  </svg>
+                  <BsCheck size={14} />
                 </button>
               ) : undefined
             }
@@ -710,10 +658,7 @@ export function AnalyzePage() {
                       </span>
                       {isUserWord && (
                         <span className="user-badge" title="User-defined word">
-                          <svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12">
-                            <path d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z" />
-                            <path d="M8 4a.75.75 0 01.75.75v2.5h2.5a.75.75 0 010 1.5h-2.5v2.5a.75.75 0 01-1.5 0v-2.5h-2.5a.75.75 0 010-1.5h2.5v-2.5A.75.75 0 018 4z" />
-                          </svg>
+                          <BsPlusCircle size={12} />
                         </span>
                       )}
                       <span className="dict-arrow">→</span>
@@ -779,11 +724,18 @@ export function AnalyzePage() {
                   {tooltipData.wordLookup ? (
                     <div className="column-body">
                       <div className="column-row">
-                        <span className="column-value phonetic">{tooltipData.wordLookup.phonetic}</span>
+                        <span className="column-value phonetic">
+                          {showIPA 
+                            ? (tooltipData.wordLookup.romanized || tooltipData.wordLookup.phonetic || '')
+                            : (tooltipData.wordLookup.phonetic || '')
+                          }
+                        </span>
                       </div>
                       {tooltipData.wordLookup.english ? (
                         <div className="column-row">
-                          <span className="column-value english">{tooltipData.wordLookup.english}</span>
+                          <span className={`column-value english ${tooltipData.wordInfo && isUserDefinedWord(tooltipData.wordInfo.word) ? 'user-defined' : ''}`}>
+                            {tooltipData.wordLookup.english}
+                          </span>
                         </div>
                       ) : (
                         <div className="column-row">
@@ -835,7 +787,9 @@ export function AnalyzePage() {
               <div className="tooltip-word-row">
                 <span className="word-label">Word:</span>
                 <span className="word-khmer" style={khmerFontStyle}>{tooltipData.wordInfo.word}</span>
-                <span className="word-meaning">{tooltipData.wordLookup.english}</span>
+                <span className={`word-meaning ${isUserDefinedWord(tooltipData.wordInfo.word) ? 'user-defined' : ''}`}>
+                  {tooltipData.wordLookup.english}
+                </span>
               </div>
             )}
 
