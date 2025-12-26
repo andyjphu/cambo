@@ -5,126 +5,59 @@
   padding: 2rem 1.5rem;
 }
 
-/* Input Section */
-.input-section {
-  margin-bottom: 1.5rem;
-}
-
-.input-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.input-label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-secondary);
-}
-
-/* Mode Toggle Buttons */
-.input-mode-toggle {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.mode-toggle-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background: var(--color-surface);
-  color: var(--color-secondary);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.mode-toggle-btn:hover:not(:disabled) {
-  background: var(--color-bg);
-  color: var(--color-text);
-  border-color: var(--color-secondary);
-}
-
-.mode-toggle-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.mode-toggle-btn.confirm-btn:hover:not(:disabled) {
-  color: var(--color-success, #22c55e);
-  border-color: var(--color-success, #22c55e);
-  background: rgba(34, 197, 94, 0.1);
-}
-
-.mode-toggle-btn.edit-btn:hover {
-  color: var(--color-accent);
-  border-color: var(--color-accent);
-  background: rgba(0, 122, 255, 0.1);
-}
-
-/* Khmer Display (non-edit mode) */
-.khmer-display {
-  position: relative;
-  width: 100%;
-  padding: var(--panel-padding);
-  padding-right: 3.5rem;
-  font-size: var(--khmer-size-lg);
-  line-height: var(--khmer-line-height);
-  border: 1px solid var(--color-border);
-  border-radius: var(--panel-radius);
-  background: var(--color-bg);
-  color: var(--color-text);
-  transition: all 0.2s ease;
-  min-height: 5rem;
-}
-
-.khmer-display:not(.interactive):hover {
-  border-color: var(--color-secondary);
-  background: var(--color-surface);
-  cursor: pointer;
-}
-
-.khmer-display.interactive {
-  cursor: default;
-}
-
-.khmer-display .placeholder {
+/* Panel hint text */
+.panel-hint {
+  font-size: 0.8125rem;
   color: var(--color-tertiary);
-  font-style: italic;
+  margin: 0 0 1rem 0;
 }
 
-/* Edit overlay button */
-.edit-overlay-btn {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
+/* Panel action buttons - consistent across all panels */
+.panel-action-btn {
   width: 28px;
   height: 28px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-surface);
+  background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: 6px;
   color: var(--color-tertiary);
   cursor: pointer;
   transition: all 0.15s ease;
-  opacity: 0.6;
+  flex-shrink: 0;
 }
 
-.edit-overlay-btn:hover {
-  opacity: 1;
-  color: var(--color-accent);
+.panel-action-btn:hover:not(:disabled) {
+  background: var(--color-surface);
   border-color: var(--color-accent);
-  background: rgba(0, 122, 255, 0.1);
+  color: var(--color-accent);
+}
+
+.panel-action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.panel-action-btn.confirm:hover:not(:disabled) {
+  border-color: var(--color-success, #22c55e);
+  color: var(--color-success, #22c55e);
+  background: rgba(34, 197, 94, 0.08);
+}
+
+/* Khmer Display (non-edit mode) */
+.khmer-display {
+  font-size: var(--khmer-size-lg);
+  line-height: var(--khmer-line-height);
+  color: var(--color-text);
+  min-height: 3rem;
+}
+
+.khmer-display .placeholder {
+  color: var(--color-tertiary);
+  font-style: italic;
+  font-size: 1rem;
 }
 
 /* Interactive cluster in display mode - render as single unit for proper Khmer ligatures */
@@ -165,170 +98,43 @@
 
 .khmer-input {
   width: 100%;
-  padding: var(--panel-padding);
+  padding: 0;
   font-size: var(--khmer-size-lg);
   line-height: var(--khmer-line-height);
-  border: 1px solid var(--color-border);
-  border-radius: var(--panel-radius);
-  background: var(--color-surface);
+  border: none;
+  background: transparent;
   color: var(--color-text);
-  resize: vertical;
-  transition: all 0.2s ease;
+  resize: none;
+  min-height: 3rem;
 }
 
 .khmer-input:focus {
   outline: none;
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
 .khmer-input::placeholder {
   color: var(--color-tertiary);
 }
 
-/* Collapsible Panels */
-.collapsible-panel {
-  margin-bottom: 1.5rem;
-  background: var(--color-surface);
-  border-radius: var(--panel-radius);
-  border: 1px solid var(--color-border);
-  overflow: hidden;
+/* Editing state for parent panel */
+.collapsible-panel:has(.khmer-input:focus) {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
-.panel-header-btn {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0.875rem 1.25rem;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--color-text);
-  transition: background-color 0.15s ease;
+/* Character Analysis content */
+.character-analysis-content {
+  /* Content flows naturally, scrollbar handled by panel-body */
 }
 
-.panel-header-btn:hover {
-  background: var(--color-bg);
-}
-
-.panel-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-
-.panel-title-group {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-}
-
-.panel-mode-badge {
-  font-size: 0.6875rem;
-  font-weight: 500;
-  color: var(--color-tertiary);
-  background: var(--color-bg);
-  padding: 0.125rem 0.5rem;
-  border-radius: 4px;
-}
-
-.collapse-icon {
-  color: var(--color-secondary);
-  transition: transform 0.2s ease;
-}
-
-.collapse-icon.expanded {
-  transform: rotate(180deg);
-}
-
-.collapsible-panel.collapsed .panel-header-btn {
-  border-bottom: none;
-}
-
-.collapsible-panel.expanded .panel-header-btn {
-  border-bottom: 1px solid var(--color-border);
-}
-
-.panel-content-wrapper {
-  padding: 0;
-}
-
-/* Override SpaceEditor and RomanizationPanel styles when inside collapsible */
-.collapsible-panel .space-editor {
-  border: none;
-  border-radius: 0;
-  margin-bottom: 0;
-}
-
-.collapsible-panel .romanization-panel {
-  border: none;
-  border-radius: 0;
-  margin-bottom: 0;
-}
-
-/* Analysis Sections */
-.analysis-section {
-  margin-bottom: 2rem;
-  padding: var(--panel-padding);
-  background: var(--color-surface);
-  border-radius: var(--panel-radius);
-  border: 1px solid var(--color-border);
-}
-
-.section-header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.section-title {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-secondary);
-  margin: 0 0 0.5rem 0;
-}
-
-.section-subtitle {
-  font-size: 0.875rem;
-  color: var(--color-tertiary);
-  margin: 0;
-}
-
-/* Selection Mode Toggle Button */
-.selection-mode-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--color-secondary);
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-}
-
-.selection-mode-btn:hover {
-  background: var(--color-surface);
-  border-color: var(--color-secondary);
-  color: var(--color-text);
-}
-
-.selection-mode-btn.active {
+/* Selection Mode - uses panel-action-btn for consistency */
+.panel-action-btn.selection.active {
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: white;
 }
 
-.selection-mode-btn.active:hover {
+.panel-action-btn.selection.active:hover {
   background: #0066d6;
 }
 
@@ -447,295 +253,9 @@
   /* No animation - keeps tooltip stable */
 }
 
-/* Component Tooltip */
-.component-tooltip {
-  position: absolute;
-  bottom: calc(100% + 12px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--color-text);
-  color: var(--color-bg);
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
-  font-size: 0.875rem;
-  white-space: nowrap;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  animation: tooltipFadeIn 0.12s ease-out;
-}
+/* Old tooltip styles removed - now using portal-based Tooltip component */
 
-.component-tooltip::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: var(--color-text);
-}
-
-.tooltip-char {
-  font-size: 1.5rem;
-}
-
-.tooltip-type {
-  font-size: 0.625rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  opacity: 0.7;
-}
-
-.tooltip-pronunciation {
-  font-family: var(--font-mono);
-  color: var(--color-accent-light);
-}
-
-.tooltip-name {
-  font-size: 0.75rem;
-  opacity: 0.8;
-}
-
-/* Unified Tooltip - shows syllable, word, and component info */
-.unified-tooltip {
-  position: absolute;
-  bottom: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--color-text);
-  color: var(--color-bg);
-  border-radius: 10px;
-  width: 300px;
-  max-width: min(340px, calc(100vw - 1rem));
-  overflow: hidden;
-  z-index: 1000;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-  animation: tooltipFadeIn 0.12s ease-out;
-}
-
-.unified-tooltip.cluster-only {
-  width: auto;
-  min-width: 180px;
-  max-width: 280px;
-}
-
-.unified-tooltip::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: var(--color-text);
-}
-
-/* Tooltip Header Row - compact syllable info */
-.tooltip-header-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.625rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.tooltip-header-row .tooltip-khmer {
-  font-size: 1.25rem;
-}
-
-.tooltip-sound {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.tooltip-sound.phonetic {
-  color: #ffd60a;
-}
-
-.tooltip-sound.ipa {
-  color: #64d2ff;
-}
-
-.tooltip-meaning {
-  font-size: 0.6875rem;
-  color: #30d158;
-  margin-left: auto;
-}
-
-/* Two Column Layout */
-.tooltip-columns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.tooltip-column {
-  padding: 0.375rem 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.word-column {
-  background: rgba(34, 197, 94, 0.04);
-}
-
-.component-column {
-  background: rgba(100, 210, 255, 0.04);
-}
-
-.column-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.375rem;
-  padding-bottom: 0.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  margin-bottom: 0.25rem;
-}
-
-.column-label {
-  font-size: 0.5rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.5;
-}
-
-.word-column .column-label {
-  color: #30d158;
-}
-
-.component-column .column-label {
-  color: #64d2ff;
-}
-
-.column-khmer {
-  font-size: 0.9375rem;
-}
-
-.column-char {
-  font-size: 1.125rem;
-}
-
-.column-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-}
-
-.column-row {
-  display: flex;
-  align-items: center;
-}
-
-.column-value {
-  font-size: 0.6875rem;
-}
-
-.column-value.phonetic {
-  font-family: var(--font-mono);
-  color: #ffd60a;
-}
-
-.column-value.english {
-  color: #30d158;
-  font-weight: 500;
-}
-
-.column-value.name {
-  opacity: 0.7;
-}
-
-.column-value.no-translation {
-  color: var(--color-tertiary);
-  font-style: italic;
-  font-size: 0.625rem;
-}
-
-.column-pos {
-  font-size: 0.5rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: rgba(255, 255, 255, 0.4);
-  margin-top: 0.125rem;
-}
-
-.column-desc {
-  font-size: 0.5625rem;
-  line-height: 1.3;
-  color: rgba(255, 255, 255, 0.5);
-  font-style: italic;
-  margin-top: 0.125rem;
-}
-
-.column-na {
-  font-size: 0.75rem;
-  opacity: 0.3;
-  text-align: center;
-}
-
-/* Word row for cluster-only tooltip */
-.tooltip-word-row {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.25rem 0.625rem;
-  background: rgba(34, 197, 94, 0.04);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 0.6875rem;
-}
-
-.word-label {
-  opacity: 0.5;
-  font-size: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.word-khmer {
-  font-size: 0.875rem;
-}
-
-.word-meaning {
-  color: #30d158;
-  margin-left: auto;
-}
-
-/* Mini components - compact */
-.tooltip-components {
-  padding: 0.375rem 0.625rem;
-  background: rgba(0, 0, 0, 0.15);
-  display: flex;
-  justify-content: center;
-  gap: 0.25rem;
-  flex-wrap: wrap;
-}
-
-.mini-component {
-  font-size: 0.8125rem;
-  padding: 0.125rem 0.375rem;
-  border-radius: 4px;
-  transition: all 0.1s ease;
-}
-
-.mini-component.active {
-  box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 3px rgba(255, 255, 255, 0.8);
-  transform: scale(1.15);
-}
-
-/* Legend */
-.legend-section {
-  margin-bottom: 2rem;
-}
-
+/* Legend - inside collapsible panel */
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -984,6 +504,19 @@
   background: var(--color-bg);
   border-radius: 10px;
   border: 1px solid var(--color-border);
+}
+
+.dict-entry.user-defined {
+  border-left: 3px solid var(--color-accent);
+  background: rgba(0, 122, 255, 0.03);
+}
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+  flex-shrink: 0;
 }
 
 .dict-khmer {

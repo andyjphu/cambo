@@ -8,7 +8,7 @@
  * - Export user dictionary
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { 
   addUserWord, 
@@ -18,6 +18,8 @@ import {
   type UserDictionaryEntry 
 } from '../../utils/userDictionary';
 import { refreshDictionary } from '../../utils/wordSegmentation';
+import { parseKhmerText } from '../../utils/khmerParser';
+import { romanizeCluster } from '../../utils/alaLcRomanization';
 import './SelectionPanel.css';
 
 interface SelectionPanelProps {
@@ -42,6 +44,29 @@ export function SelectionPanel({ selectedText, isOpen, onClose, onWordAdded }: S
 
   const khmerFontStyle = { fontFamily: `'${settings.selectedFont.family}', 'Noto Sans Khmer', sans-serif` };
 
+  // Auto-generate romanization from selected text
+  const autoRomanization = useMemo(() => {
+    if (!selectedText.trim()) return { romanized: '', phonetic: '' };
+    
+    try {
+      const clusters = parseKhmerText(selectedText);
+      const nonSpaceClusters = clusters.filter(c => c.type !== 'space');
+      
+      if (nonSpaceClusters.length === 0) return { romanized: '', phonetic: '' };
+      
+      // Romanize each cluster and join
+      const parts = nonSpaceClusters.map(cluster => romanizeCluster(cluster.components));
+      
+      const romanized = parts.map(p => p.romanized).join('-');
+      const phonetic = parts.map(p => p.phonetic).join('-');
+      
+      return { romanized, phonetic };
+    } catch (e) {
+      console.warn('Failed to auto-romanize:', e);
+      return { romanized: '', phonetic: '' };
+    }
+  }, [selectedText]);
+
   if (!isOpen) return null;
 
   const dictCount = getUserDictionaryCount();
@@ -59,10 +84,16 @@ export function SelectionPanel({ selectedText, isOpen, onClose, onWordAdded }: S
   const handleSaveWord = () => {
     if (!selectedText.trim()) return;
     
+    // Use user-provided phonetic or fall back to auto-generated
+    const finalPhonetic = phonetic.trim() || autoRomanization.phonetic;
+    // Use auto-generated romanized (ALA-LC style)
+    const finalRomanized = autoRomanization.romanized;
+    
     const entry = addUserWord({
       khmer: selectedText,
       english: english.trim(),
-      phonetic: phonetic.trim() || undefined,
+      phonetic: finalPhonetic || undefined,
+      romanized: finalRomanized || undefined,
       pos: pos as UserDictionaryEntry['pos'] || undefined,
     });
     
@@ -187,8 +218,11 @@ export function SelectionPanel({ selectedText, isOpen, onClose, onWordAdded }: S
                 type="text"
                 value={phonetic}
                 onChange={(e) => setPhonetic(e.target.value)}
-                placeholder="e.g., SUOS-DAY"
+                placeholder={autoRomanization.phonetic || 'e.g., SUOS-DAY'}
               />
+              {autoRomanization.phonetic && !phonetic && (
+                <span className="auto-hint">Auto: {autoRomanization.phonetic}</span>
+              )}
             </div>
             <div className="form-group">
               <label htmlFor="pos">Part of Speech</label>

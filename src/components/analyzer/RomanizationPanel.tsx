@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { type KhmerCluster } from '../../utils/khmerParser';
 import { romanizeCluster } from '../../utils/alaLcRomanization';
-import { lookupKhmer } from '../../utils/dictionaryCore';
+import { getDictionaryEntry } from '../../utils/wordSegmentation';
 import { getSyllableColor } from '../../utils/colors';
 import { ConfidenceWarning } from './ConfidenceWarning';
 import './RomanizationPanel.css';
@@ -54,8 +54,8 @@ export function RomanizationPanel({
         return;
       }
 
-      // Check dictionary first
-      const dictEntry = lookupKhmer(cluster.text);
+      // Check dictionary first (user dictionary takes precedence)
+      const dictEntry = getDictionaryEntry(cluster.text);
       if (dictEntry) {
         result.push({
           khmer: cluster.text,

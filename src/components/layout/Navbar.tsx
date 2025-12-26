@@ -25,6 +25,12 @@ export function Navbar() {
           >
             Lookup
           </Link>
+          <Link 
+            to="/dictionary" 
+            className={`nav-link ${location.pathname === '/dictionary' ? 'active' : ''}`}
+          >
+            Dictionary
+          </Link>
         </nav>
         
         <div className="navbar-tagline">

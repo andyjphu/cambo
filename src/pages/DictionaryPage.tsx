@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useSettings } from '../context/SettingsContext';
-import { coreDictionary, type DictionaryEntry } from '../utils/dictionaryCore';
+import { coreDictionary } from '../utils/dictionaryCore';
 import { 
   getUserDictionary, 
   removeUserWord, 
@@ -209,6 +209,7 @@ export function DictionaryPage() {
                   <div className="word-details">
                     {entry.english && <span className="word-english">{entry.english}</span>}
                     {entry.phonetic && <span className="word-phonetic">/{entry.phonetic}/</span>}
+                    {entry.romanized && <span className="word-romanized">[{entry.romanized}]</span>}
                     {entry.pos && <span className="word-pos">{entry.pos}</span>}
                   </div>
                   <div className="word-meta">
